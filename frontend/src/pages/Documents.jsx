@@ -57,7 +57,6 @@ export default function Documents() {
   const [cat,        setCat]        = useState(() => new URLSearchParams(qs).get('category') || '');
   const [primaryTab, setPrimaryTab] = useState(() => new URLSearchParams(qs).get('primary') || 'shared_by_us');
 
-  // Sync from sidebar nav links
   useEffect(() => {
     const params = new URLSearchParams(qs);
     const p = params.get('primary');
@@ -157,7 +156,7 @@ export default function Documents() {
     <Layout>
       <div className="max-w-5xl mx-auto">
 
-        {/* Header */}
+        
         <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }}
           className="flex items-start justify-between mb-8 gap-4">
           <div>
@@ -169,7 +168,7 @@ export default function Documents() {
           </button>
         </motion.div>
 
-        {/* Primary folder tabs */}
+        
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.04 }}
           className="grid grid-cols-2 gap-3 mb-5">
           {DOC_PRIMARY_TABS.map(pt => {
@@ -203,7 +202,7 @@ export default function Documents() {
           })}
         </motion.div>
 
-        {/* Filters */}
+        
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.06 }}
           className="flex items-center gap-3 mb-6 flex-wrap">
           <div className="relative flex-1 min-w-[200px] max-w-sm">
@@ -223,7 +222,7 @@ export default function Documents() {
           </div>
         </motion.div>
 
-        {/* Content */}
+        
         {loading ? (
           <div className="space-y-3">
             {[...Array(8)].map((_, i) => <div key={i} className="h-16 shimmer rounded-xl" />)}
@@ -263,7 +262,7 @@ export default function Documents() {
         )}
       </div>
 
-      {/* Upload modal */}
+      
       <AnimatePresence>
         {showUpload && (
           <motion.div
@@ -291,7 +290,7 @@ export default function Documents() {
 
               <form onSubmit={handleUpload} className="px-6 py-5 space-y-4">
 
-                {/* Client picker */}
+                
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 mb-1.5">Client *</label>
                   <select required value={uploadForm.clientId}
@@ -302,7 +301,7 @@ export default function Documents() {
                   </select>
                 </div>
 
-                {/* Category */}
+                
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 mb-1.5">Category *</label>
                   <div className="grid grid-cols-2 gap-2">
@@ -324,7 +323,7 @@ export default function Documents() {
                   </div>
                 </div>
 
-                {/* Document type */}
+                
                 {uploadForm.category && (
                   <div>
                     <label className="block text-xs font-semibold text-gray-500 mb-1.5">Document type</label>
@@ -339,7 +338,7 @@ export default function Documents() {
                   </div>
                 )}
 
-                {/* Period fields */}
+                
                 {isReturn && (
                   <div className="grid grid-cols-2 gap-3">
                     <div>
@@ -365,7 +364,7 @@ export default function Documents() {
                   </div>
                 )}
 
-                {/* Dropzone */}
+                
                 <div {...getRootProps()} className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${
                   isDragActive ? 'border-indigo-400 bg-indigo-50' :
                   file ? 'border-green-400 bg-green-50' :
@@ -387,7 +386,7 @@ export default function Documents() {
                   )}
                 </div>
 
-                {/* Description */}
+                
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 mb-1.5">Notes (optional)</label>
                   <textarea rows={2} value={uploadForm.description}

@@ -25,7 +25,7 @@ app.use(cors({
 }));
 
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, max: 30,
+  windowMs: 15 * 60 * 1000, max: 200,
   standardHeaders: true, legacyHeaders: false,
   message: { message: 'Too many requests, please try again in 15 minutes.' },
 });

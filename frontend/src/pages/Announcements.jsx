@@ -81,7 +81,7 @@ export default function Announcements() {
     <Layout>
       <div className="max-w-3xl mx-auto space-y-8">
 
-        {/* Header */}
+        
         <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} className="flex items-start justify-between gap-4">
           <div>
             <h1 className="page-title">Announcements</h1>
@@ -96,7 +96,7 @@ export default function Announcements() {
           )}
         </motion.div>
 
-        {/* Category filter pills */}
+        
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.05 }}
           className="flex flex-wrap gap-2">
           {[{ value: 'all', label: 'All' }, ...CATEGORIES].map(c => (
@@ -111,7 +111,7 @@ export default function Announcements() {
           ))}
         </motion.div>
 
-        {/* List */}
+        
         {loading ? (
           <div className="space-y-3">
             {[...Array(3)].map((_, i) => <div key={i} className="h-28 shimmer rounded-xl" />)}
@@ -173,7 +173,7 @@ export default function Announcements() {
         )}
       </div>
 
-      {/* Create / Edit modal */}
+      
       <AnimatePresence>
         {showModal && (
           <motion.div

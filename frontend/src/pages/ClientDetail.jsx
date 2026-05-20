@@ -174,7 +174,7 @@ export default function ClientDetail() {
     <Layout>
       <div className="max-w-5xl mx-auto space-y-8">
 
-        {/* ── Back + profile header ───────────────── */}
+        
         <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }}>
           <Link to="/clients" className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-700 transition-colors mb-6 font-medium">
             <RiArrowLeftLine /> Clients
@@ -186,7 +186,7 @@ export default function ClientDetail() {
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">{client.name}</h1>
                 <p className="text-sm text-gray-400 mt-0.5 capitalize">{client.businessType?.replace('_', ' ')}</p>
-                {/* Meta row */}
+                
                 <div className="flex flex-wrap gap-4 mt-2">
                   {client.gstin && (
                     <span className="flex items-center gap-1.5 text-xs text-gray-500">
@@ -232,7 +232,7 @@ export default function ClientDetail() {
             </div>
           )}
 
-          {/* Client portal login card */}
+          
           {isCA && (
             <div className={`mt-4 inline-flex items-center gap-3 px-4 py-2.5 rounded-xl border text-sm ${
               clientLogin ? 'border-green-100 bg-green-50' : 'border-gray-100 bg-gray-50'
@@ -260,7 +260,7 @@ export default function ClientDetail() {
           )}
         </motion.div>
 
-        {/* ── Tabs + filter row ───────────────────── */}
+        
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} className="flex items-center justify-between flex-wrap gap-3">
           <div className="flex items-center gap-0.5 border-b border-gray-100 w-full pb-0">
             {TABS.map(tab => (
@@ -293,7 +293,7 @@ export default function ClientDetail() {
           </div>
         </motion.div>
 
-        {/* ── Documents ───────────────────────────── */}
+        
         {filteredDocs.length === 0 ? (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="py-20 flex flex-col items-center text-gray-400">
             <RiFileTextLine className="text-4xl mb-3" />
@@ -324,7 +324,7 @@ export default function ClientDetail() {
         )}
       </div>
 
-      {/* ── Create client login modal ─────────────── */}
+      
       <AnimatePresence>
         {showLoginModal && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -379,7 +379,7 @@ export default function ClientDetail() {
         )}
       </AnimatePresence>
 
-      {/* ── File Return modal ────────────────────── */}
+      
       <AnimatePresence>
         {showReturn && (
           <motion.div
@@ -421,7 +421,7 @@ export default function ClientDetail() {
                 finally { setUploading(false); }
               }} className="px-6 py-5 space-y-4">
 
-                {/* Return type selector */}
+                
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 mb-2">Return type *</label>
                   <div className="grid grid-cols-3 gap-2">
@@ -474,7 +474,7 @@ export default function ClientDetail() {
                   </div>
                 </div>
 
-                {/* Drop zone */}
+                
                 <div {...getRootProps()} className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${
                   isDragActive ? 'border-indigo-400 bg-indigo-50' :
                   file ? 'border-green-400 bg-green-50' :
@@ -515,7 +515,7 @@ export default function ClientDetail() {
         )}
       </AnimatePresence>
 
-      {/* ── Upload modal ─────────────────────────── */}
+      
       <AnimatePresence>
         {showUpload && (
           <motion.div
@@ -543,7 +543,7 @@ export default function ClientDetail() {
               </div>
 
               <form onSubmit={handleUpload} className="px-6 py-5 space-y-4">
-                {/* Drop zone */}
+                
                 <div {...getRootProps()} className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${
                   isDragActive ? 'border-indigo-400 bg-indigo-50' :
                   file ? 'border-green-400 bg-green-50' :

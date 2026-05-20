@@ -12,7 +12,6 @@ export const AuthProvider = ({ children }) => {
       const { data } = await api.get('/auth/me');
       setUser(data.user);
     } catch (err) {
-      // 401 = not logged in, clear user silently; other errors are unexpected
       if (err.response?.status !== 401) {
         console.error('Auth check failed:', err.message);
       }
@@ -32,8 +31,8 @@ export const AuthProvider = ({ children }) => {
     return data.user;
   };
 
-  const googleLogin = async (credential) => {
-    const { data } = await api.post('/auth/google', { credential });
+  const googleLogin = async (accessToken) => {
+    const { data } = await api.post('/auth/google', { access_token: accessToken });
     setUser(data.user);
     return data.user;
   };

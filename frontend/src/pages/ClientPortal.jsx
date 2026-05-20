@@ -13,13 +13,11 @@ import {
   RiCloseLine, RiCheckLine,
 } from 'react-icons/ri';
 
-// ── Primary folders ───────────────────────────────────────────────────────────
 const PRIMARY_TABS = [
   { key: 'my_uploads', label: 'My Uploads',  desc: 'Files you submitted',        icon: RiUploadCloud2Line },
   { key: 'from_ca',    label: 'From CA',     desc: 'Files shared by your CA',    icon: RiShieldCheckLine  },
 ];
 
-// ── Sub-category tabs (same for both folders) ─────────────────────────────────
 const SUB_TABS = [
   { key: 'all',             label: 'All',           icon: RiFolder3Line   },
   { key: 'client_document', label: 'Documents',     icon: RiFileTextLine  },
@@ -52,7 +50,6 @@ function fmtDate(s) {
   return new Date(s).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-// ── Slide ticker ──────────────────────────────────────────────────────────────
 function SlideNewsTicker({ items }) {
   const [current, setCurrent] = useState(0);
   const [dir, setDir] = useState(1);
@@ -110,7 +107,6 @@ function SlideNewsTicker({ items }) {
   );
 }
 
-// ── Upload modal ──────────────────────────────────────────────────────────────
 function UploadModal({ category, types, clientId, onClose, onUploaded }) {
   const [docType,   setDocType]   = useState(types[0].value);
   const [file,      setFile]      = useState(null);
@@ -227,7 +223,6 @@ function UploadModal({ category, types, clientId, onClose, onUploaded }) {
   );
 }
 
-// ── Announcement card ─────────────────────────────────────────────────────────
 function AnnouncementCard({ ann, index }) {
   const [expanded, setExpanded] = useState(false);
   const colors = CAT_COLORS[ann.category] || CAT_COLORS.general;
@@ -272,7 +267,6 @@ function AnnouncementCard({ ann, index }) {
   );
 }
 
-// ── Main page ─────────────────────────────────────────────────────────────────
 export default function ClientPortal() {
   const { user } = useAuth();
   const { search: qs } = useLocation();
@@ -286,7 +280,6 @@ export default function ClientPortal() {
   const [subTab,        setSubTab]        = useState(() => new URLSearchParams(qs).get('sub') || 'all');
   const [uploadModal,   setUploadModal]   = useState(null);
 
-  // Sync from sidebar nav links (both primary folder and sub-category)
   useEffect(() => {
     const params = new URLSearchParams(qs);
     const p = params.get('primary');
@@ -316,18 +309,14 @@ export default function ClientPortal() {
       .catch(() => {});
   };
 
-  // Split into two primary buckets
   const myDocs  = documents.filter(d => d.uploadedBy?._id === user?._id || d.uploadedBy?.role === 'client');
   const caDocs  = documents.filter(d => d.uploadedBy?.role === 'ca' || d.uploadedBy?.role === 'staff');
   const bucket  = primaryTab === 'my_uploads' ? myDocs : caDocs;
 
-  // Sub-tab filter within the bucket
   const filtered = subTab === 'all' ? bucket : bucket.filter(d => d.category === subTab);
 
-  // Counts per primary
   const primaryCounts = { my_uploads: myDocs.length, from_ca: caDocs.length };
 
-  // Counts per sub-tab within current bucket
   const subCounts = {
     all:             bucket.length,
     client_document: bucket.filter(d => d.category === 'client_document').length,
@@ -351,14 +340,14 @@ export default function ClientPortal() {
     <Layout>
       <div className="max-w-4xl mx-auto space-y-8">
 
-        {/* Slide ticker */}
+        
         {announcements.length > 0 && (
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
             <SlideNewsTicker items={announcements} />
           </motion.div>
         )}
 
-        {/* Hero */}
+        
         <motion.section initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.05 }}>
           <p className="text-sm text-gray-400 mb-1">
             {now.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
@@ -390,7 +379,7 @@ export default function ClientPortal() {
           </div>
         </motion.section>
 
-        {/* Upload cards */}
+        
         <section>
           <h2 className="text-base font-semibold text-gray-900 mb-4">Upload Documents</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -429,7 +418,7 @@ export default function ClientPortal() {
           </div>
         </section>
 
-        {/* Announcements */}
+        
         {recentAnns.length > 0 && (
           <section>
             <div className="flex items-center justify-between mb-4">
@@ -444,11 +433,11 @@ export default function ClientPortal() {
           </section>
         )}
 
-        {/* Files section */}
+        
         <motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
           <h2 className="text-base font-semibold text-gray-900 mb-4">Your Files</h2>
 
-          {/* Primary folder tabs */}
+          
           <div className="grid grid-cols-2 gap-3 mb-5">
             {PRIMARY_TABS.map(pt => {
               const active = primaryTab === pt.key;
@@ -481,7 +470,7 @@ export default function ClientPortal() {
             })}
           </div>
 
-          {/* Sub-category tabs */}
+          
           <div className="flex items-center gap-0.5 border-b border-gray-100 mb-5 overflow-x-auto">
             {SUB_TABS.map(st => (
               <button key={st.key} onClick={() => setSubTab(st.key)}
@@ -500,7 +489,7 @@ export default function ClientPortal() {
             ))}
           </div>
 
-          {/* File list */}
+          
           {loading ? (
             <div className="space-y-3">
               {[...Array(4)].map((_, i) => <div key={i} className="h-16 shimmer rounded-xl" />)}

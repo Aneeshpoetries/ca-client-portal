@@ -67,7 +67,7 @@ export default function Clients() {
     <Layout>
       <div className="max-w-5xl mx-auto">
 
-        {/* ── Page header ─────────────────────────── */}
+        
         <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} className="flex items-start justify-between mb-8">
           <div>
             <h1 className="page-title">{isCA ? 'Clients' : 'My Clients'}</h1>
@@ -80,7 +80,7 @@ export default function Clients() {
           )}
         </motion.div>
 
-        {/* ── Search ──────────────────────────────── */}
+        
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.06 }} className="mb-6">
           <div className="relative max-w-sm">
             <RiSearchLine className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
@@ -94,7 +94,7 @@ export default function Clients() {
           </div>
         </motion.div>
 
-        {/* ── Table ───────────────────────────────── */}
+        
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} className="card overflow-hidden">
           {loading ? (
             <div className="divide-y divide-gray-50">
@@ -120,7 +120,7 @@ export default function Clients() {
             </div>
           ) : (
             <>
-              {/* Header row */}
+              
               <div className="grid grid-cols-[2fr_1.5fr_1fr_1fr_40px] gap-4 px-5 py-3 border-b border-gray-100">
                 <span className="section-label">Name</span>
                 <span className="section-label">GSTIN / PAN</span>
@@ -141,7 +141,7 @@ export default function Clients() {
                       to={`/clients/${client._id}`}
                       className="grid grid-cols-[2fr_1.5fr_1fr_1fr_40px] gap-4 items-center px-5 py-4 hover:bg-gray-50 transition-colors group"
                     >
-                      {/* Name + location */}
+                      
                       <div className="flex items-center gap-3 min-w-0">
                         <div className="avatar w-8 h-8 text-xs flex-shrink-0">
                           {client.name.charAt(0).toUpperCase()}
@@ -156,7 +156,7 @@ export default function Clients() {
                         </div>
                       </div>
 
-                      {/* GSTIN / PAN */}
+                      
                       <div className="min-w-0">
                         {client.gstin ? (
                           <p className="text-xs text-gray-500 font-mono truncate">{client.gstin}</p>
@@ -167,13 +167,13 @@ export default function Clients() {
                         )}
                       </div>
 
-                      {/* Type */}
+                      
                       <span className="badge badge-gray">{BIZ_LABEL[client.businessType] || 'Other'}</span>
 
-                      {/* Docs count */}
+                      
                       <span className="text-sm text-gray-500">{client.documentCount || 0}</span>
 
-                      {/* Arrow */}
+                      
                       <RiArrowRightLine className="text-gray-300 group-hover:text-indigo-400 transition-colors" />
                     </Link>
                   </motion.div>
@@ -184,7 +184,7 @@ export default function Clients() {
         </motion.div>
       </div>
 
-      {/* ── Create modal ─────────────────────────── */}
+      
       <AnimatePresence>
         {showModal && (
           <motion.div

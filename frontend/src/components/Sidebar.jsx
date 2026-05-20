@@ -1,15 +1,13 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import toast from 'react-hot-toast';
-import { RiLogoutBoxLine, RiUser3Line, RiMenuLine, RiCloseLine, RiArrowDownSLine } from 'react-icons/ri';
-
-// ── Nav link definitions ──────────────────────────────────────────────────────
-// Types:
-//   { to, label }                   — direct link
-//   { label, children: [...] }      — simple dropdown (flat list)
-//   { label, sections: [{heading, children}] } — two-column mega-menu
+import {
+  RiLogoutBoxLine, RiUser3Line, RiMenuLine, RiCloseLine,
+  RiArrowDownSLine, RiSunLine, RiMoonLine,
+} from 'react-icons/ri';
 
 const caLinks = [
   { to: '/dashboard',     label: 'Home' },
@@ -79,20 +77,20 @@ const clientLinks = [
       {
         heading: 'My Uploads',
         children: [
-          { to: '/portal?primary=my_uploads',                              label: 'All Files'    },
+          { to: '/portal?primary=my_uploads',                              label: 'All'          },
           { to: '/portal?primary=my_uploads&sub=gst_return',              label: 'GST Returns'  },
-          { to: '/portal?primary=my_uploads&sub=itr',                     label: 'ITR'          },
-          { to: '/portal?primary=my_uploads&sub=client_document',         label: 'Documents'    },
+          { to: '/portal?primary=my_uploads&sub=itr',                     label: 'ITR Files'    },
+          { to: '/portal?primary=my_uploads&sub=client_document',         label: 'Client Files' },
           { to: '/portal?primary=my_uploads&sub=other_return',            label: 'Other Returns'},
         ],
       },
       {
         heading: 'From CA',
         children: [
-          { to: '/portal?primary=from_ca',                                label: 'All Files'    },
+          { to: '/portal?primary=from_ca',                                label: 'All'          },
           { to: '/portal?primary=from_ca&sub=gst_return',                 label: 'GST Returns'  },
-          { to: '/portal?primary=from_ca&sub=itr',                        label: 'ITR'          },
-          { to: '/portal?primary=from_ca&sub=client_document',            label: 'Documents'    },
+          { to: '/portal?primary=from_ca&sub=itr',                        label: 'ITR Files'    },
+          { to: '/portal?primary=from_ca&sub=client_document',            label: 'Client Files' },
           { to: '/portal?primary=from_ca&sub=other_return',               label: 'Other Returns'},
         ],
       },
@@ -101,11 +99,17 @@ const clientLinks = [
   { to: '/announcements', label: 'Updates' },
 ];
 
-// ── Sidebar component ─────────────────────────────────────────────────────────
 export default function Sidebar() {
   const { user, logout, isCA, isClient } = useAuth();
-  const navigate = useNavigate();
+  const { isDark, toggle }               = useTheme();
+  const navigate  = useNavigate();
+  const location  = useLocation();
   const links = isClient ? clientLinks : (isCA ? caLinks : staffLinks);
+
+  const isChildActive = (to) => {
+    const [p, q] = to.split('?');
+    return location.pathname === p && location.search === (q ? '?' + q : '');
+  };
 
   const [userOpen,     setUserOpen]     = useState(false);
   const [navDropdown,  setNavDropdown]  = useState(null);
@@ -129,9 +133,44 @@ export default function Sidebar() {
     catch { toast.error('Logout failed'); }
   };
 
-  // ── Desktop nav item renderer ─────────────────────────────────────────────
+  const S = {
+    header: isDark
+      ? { background: 'rgba(14,20,18,0.92)', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)',
+          borderBottom: '1px solid rgba(32,184,154,0.14)', boxShadow: '0 1px 0 rgba(32,184,154,0.08), 0 4px 16px rgba(0,0,0,0.35)' }
+      : { background: 'rgba(242,239,233,0.90)', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)',
+          borderBottom: '1px solid rgba(14,92,79,0.14)', boxShadow: '0 1px 0 rgba(14,92,79,0.08), 0 4px 16px rgba(20,30,25,0.07)' },
+
+    dropdown: isDark
+      ? { background: 'rgba(20,28,24,0.98)', border: '1px solid rgba(32,184,154,0.18)', boxShadow: '0 12px 28px -4px rgba(0,0,0,0.50), 0 4px 10px -2px rgba(0,0,0,0.35)' }
+      : { background: 'rgba(250,249,246,0.98)', border: '1px solid rgba(14,92,79,0.14)', boxShadow: '0 12px 28px -4px rgba(10,60,50,0.14), 0 4px 10px -2px rgba(20,30,25,0.08)' },
+
+    navActive: isDark
+      ? { color: '#7de8d4', background: '#182820', boxShadow: 'inset 2px 0 0 #20b89a' }
+      : { color: '#0a4a3e', fontWeight: '600', boxShadow: 'inset 2px 0 0 #148a74', background: 'rgba(14,92,79,0.06)' },
+    navDefault: isDark ? { color: '#b0c0b8' } : { color: '#3d4a44' },
+    navHover:   isDark ? 'hover:bg-[#182820]' : 'hover:bg-black/[0.04]',
+
+    sectionHeading: { color: isDark ? '#40c8a8' : '#6ab8a8' },
+    brandText:      { color: isDark ? '#20b89a' : '#0e5c4f' },
+    dividerBorder:  isDark ? 'rgba(32,184,154,0.10)' : '#f3f4f6',
+
+    panelName:   isDark ? '#ece9e4' : '#111827',
+    panelEmail:  isDark ? '#6a8880' : '#9ca3af',
+    panelRole:   isDark ? '#40c8a8' : '#6366f1',
+    panelLink:   isDark ? 'text-[#b0c0b8] hover:bg-[#1a2c28]' : 'text-gray-700 hover:bg-gray-50',
+    panelLogout: isDark ? 'text-red-400 hover:bg-red-950/40' : 'text-red-600 hover:bg-red-50',
+
+    mobileNav:    isDark
+      ? { background: 'rgba(14,20,18,0.98)', borderColor: 'rgba(32,184,154,0.12)' }
+      : { background: 'rgba(242,239,233,0.97)', borderColor: 'rgba(14,92,79,0.12)' },
+    mobileAccordBorder: isDark ? 'border-[#2c3c34]' : 'border-gray-100',
+    mobileHeading:      isDark ? 'text-[#40c8a8]' : 'text-gray-400',
+    userHover:          isDark ? 'hover:bg-[#182820]' : 'hover:bg-indigo-50',
+    mobileHamburger:    isDark ? 'text-gray-400 hover:bg-[#182820]' : 'text-gray-500 hover:bg-gray-100',
+    toggleBtn:          isDark ? 'text-[#40c8a8] hover:bg-[#182820]' : 'text-[#0e5c4f] hover:bg-[#d6ede8]',
+  };
+
   const renderDesktopLink = (link) => {
-    // Sectioned mega-menu
     if (link.sections) {
       const open = navDropdown === link.label;
       return (
@@ -150,29 +189,30 @@ export default function Sidebar() {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 4, scale: 0.97 }}
                 transition={{ duration: 0.13 }}
-                className="absolute top-full mt-2 left-0 bg-white rounded-2xl py-3 z-50 min-w-[300px]"
-                style={{ border: '1px solid #e2e8f0', boxShadow: '0 10px 24px -4px rgba(15,23,42,0.12), 0 4px 8px -2px rgba(15,23,42,0.06), 0 0 0 1px rgba(15,23,42,0.04)' }}
+                className="absolute top-full mt-2 left-0 rounded-2xl py-3 z-50 min-w-[300px]"
+                style={S.dropdown}
               >
-                <div className={`grid divide-x divide-gray-100 ${link.sections.length === 2 ? 'grid-cols-2' : 'grid-cols-1'}`}>
+                <div className={`grid ${link.sections.length === 2 ? 'grid-cols-2' : 'grid-cols-1'}`}
+                  style={{ borderColor: S.dividerBorder }}>
                   {link.sections.map(section => (
                     <div key={section.heading} className="px-3">
-                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-2 mb-1.5">
+                      <p className="text-[10px] font-bold uppercase tracking-wider px-2 mb-1.5" style={S.sectionHeading}>
                         {section.heading}
                       </p>
-                      {section.children.map(child => (
-                        <NavLink
-                          key={child.to}
-                          to={child.to}
-                          onClick={() => setNavDropdown(null)}
-                          className={({ isActive }) =>
-                            `block px-2 py-1.5 text-sm rounded-lg transition-colors hover:bg-gray-50 ${
-                              isActive ? 'text-gray-900 font-semibold bg-gray-50' : 'text-gray-600'
-                            }`
-                          }
-                        >
-                          {child.label}
-                        </NavLink>
-                      ))}
+                      {section.children.map(child => {
+                        const active = isChildActive(child.to);
+                        return (
+                          <NavLink
+                            key={child.to}
+                            to={child.to}
+                            onClick={() => setNavDropdown(null)}
+                            className={`block px-2 py-1.5 text-sm rounded-lg transition-all duration-100 ${active ? '' : S.navHover}`}
+                            style={active ? S.navActive : S.navDefault}
+                          >
+                            {child.label}
+                          </NavLink>
+                        );
+                      })}
                     </div>
                   ))}
                 </div>
@@ -183,7 +223,6 @@ export default function Sidebar() {
       );
     }
 
-    // Simple dropdown (flat list)
     if (link.children) {
       const open = navDropdown === link.label;
       return (
@@ -202,23 +241,23 @@ export default function Sidebar() {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 4, scale: 0.97 }}
                 transition={{ duration: 0.13 }}
-                className="absolute top-full mt-2 left-0 w-48 bg-white rounded-xl py-1.5 z-50"
-                style={{ border: '1px solid #e2e8f0', boxShadow: '0 10px 24px -4px rgba(15,23,42,0.12), 0 4px 8px -2px rgba(15,23,42,0.06)' }}
+                className="absolute top-full mt-2 left-0 w-48 rounded-xl py-1.5 z-50"
+                style={S.dropdown}
               >
-                {link.children.map(child => (
-                  <NavLink
-                    key={child.to}
-                    to={child.to}
-                    onClick={() => setNavDropdown(null)}
-                    className={({ isActive }) =>
-                      `block px-3.5 py-2 text-sm transition-colors hover:bg-gray-50 ${
-                        isActive ? 'text-gray-900 font-semibold bg-gray-50' : 'text-gray-600'
-                      }`
-                    }
-                  >
-                    {child.label}
-                  </NavLink>
-                ))}
+                {link.children.map(child => {
+                  const active = isChildActive(child.to);
+                  return (
+                    <NavLink
+                      key={child.to}
+                      to={child.to}
+                      onClick={() => setNavDropdown(null)}
+                      className={`block px-3.5 py-2 text-sm transition-all duration-100 ${active ? '' : S.navHover}`}
+                      style={active ? S.navActive : S.navDefault}
+                    >
+                      {child.label}
+                    </NavLink>
+                  );
+                })}
               </motion.div>
             )}
           </AnimatePresence>
@@ -226,7 +265,6 @@ export default function Sidebar() {
       );
     }
 
-    // Direct link
     return (
       <NavLink
         key={link.to}
@@ -238,9 +276,7 @@ export default function Sidebar() {
     );
   };
 
-  // ── Mobile nav item renderer ──────────────────────────────────────────────
   const renderMobileLink = (link) => {
-    // Sectioned accordion
     if (link.sections) {
       const open = mobileAccord === link.label;
       return (
@@ -262,8 +298,8 @@ export default function Sidebar() {
                 className="overflow-hidden"
               >
                 {link.sections.map(section => (
-                  <div key={section.heading} className="pl-3 border-l-2 border-gray-100 ml-2 mt-1 mb-2">
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-2 pt-1 pb-1">
+                  <div key={section.heading} className={`pl-3 border-l-2 ml-2 mt-1 mb-2 ${S.mobileAccordBorder}`}>
+                    <p className={`text-[10px] font-bold uppercase tracking-wider px-2 pt-1 pb-1 ${S.mobileHeading}`}>
                       {section.heading}
                     </p>
                     {section.children.map(child => (
@@ -285,7 +321,6 @@ export default function Sidebar() {
       );
     }
 
-    // Simple accordion
     if (link.children) {
       const open = mobileAccord === link.label;
       return (
@@ -304,7 +339,7 @@ export default function Sidebar() {
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
                 transition={{ duration: 0.15 }}
-                className="overflow-hidden pl-3 border-l-2 border-gray-100 ml-2 mt-0.5 mb-1"
+                className={`overflow-hidden pl-3 border-l-2 ml-2 mt-0.5 mb-1 ${S.mobileAccordBorder}`}
               >
                 {link.children.map(child => (
                   <NavLink
@@ -323,7 +358,6 @@ export default function Sidebar() {
       );
     }
 
-    // Direct link
     return (
       <NavLink
         key={link.to}
@@ -337,36 +371,46 @@ export default function Sidebar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b"
-      style={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(12px)', borderColor: '#e2e8f0' }}>
+    <header className="sticky top-0 z-50" style={S.header}>
       <div className="max-w-screen-xl mx-auto px-6 h-[54px] flex items-center gap-6">
 
-        {/* Brand */}
+        
         <NavLink to="/dashboard" className="flex items-center gap-2.5 flex-shrink-0 mr-2">
           <div className="w-7 h-7 rounded-lg flex items-center justify-center shadow-sm"
-            style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }}>
+            style={{ background: 'linear-gradient(135deg, #148a74, #0e5c4f)' }}>
             <span className="text-white text-[11px] font-extrabold tracking-tight">CA</span>
           </div>
-          <span className="font-bold text-gray-900 text-[15px] tracking-tight">Portal</span>
+          <span className="font-bold text-[15px] tracking-tight" style={S.brandText}>Portal</span>
         </NavLink>
 
-        {/* Desktop nav */}
+        
         <nav className="hidden md:flex items-center gap-0.5 flex-1" ref={navRef}>
           {links.map(renderDesktopLink)}
         </nav>
 
-        {/* Right side */}
-        <div className="ml-auto flex items-center gap-3">
+        
+        <div className="ml-auto flex items-center gap-2">
 
-          {/* User dropdown */}
+          
+          <button
+            onClick={toggle}
+            aria-label="Toggle theme"
+            className={`p-1.5 rounded-lg transition-colors ${S.toggleBtn}`}
+          >
+            {isDark ? <RiSunLine className="text-base" /> : <RiMoonLine className="text-base" />}
+          </button>
+
+          
           <div className="relative" ref={userRef}>
             <button
               onClick={() => setUserOpen(v => !v)}
-              className="flex items-center gap-2 h-8 pl-1 pr-2.5 rounded-full hover:bg-gray-100 transition-colors"
+              className={`flex items-center gap-2 h-8 pl-1 pr-2.5 rounded-full transition-colors ${S.userHover}`}
             >
               <div className="avatar w-6 h-6 text-[11px]">{user?.name?.charAt(0).toUpperCase()}</div>
-              <span className="hidden sm:block text-sm font-medium text-gray-700 max-w-[110px] truncate">{user?.name}</span>
-              <RiArrowDownSLine className={`text-gray-400 text-xs transition-transform ${userOpen ? 'rotate-180' : ''}`} />
+              <span className="hidden sm:block text-sm font-medium max-w-[110px] truncate" style={S.brandText}>
+                {user?.name}
+              </span>
+              <RiArrowDownSLine className={`text-xs transition-transform ${userOpen ? 'rotate-180' : ''}`} style={{ color: isDark ? '#40c8a8' : '#6ab8a8' }} />
             </button>
             <AnimatePresence>
               {userOpen && (
@@ -375,23 +419,23 @@ export default function Sidebar() {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 4, scale: 0.97 }}
                   transition={{ duration: 0.12 }}
-                  className="absolute right-0 top-full mt-2 w-52 bg-white rounded-xl py-1.5 z-50"
-                  style={{ border: '1px solid #e2e8f0', boxShadow: '0 10px 24px -4px rgba(15,23,42,0.12), 0 4px 8px -2px rgba(15,23,42,0.06)' }}
+                  className="absolute right-0 top-full mt-2 w-52 rounded-xl py-1.5 z-50"
+                  style={S.dropdown}
                 >
-                  <div className="px-3.5 py-2.5 border-b border-gray-50">
-                    <p className="text-sm font-semibold text-gray-900">{user?.name}</p>
-                    <p className="text-xs text-gray-400 truncate mt-0.5">{user?.email}</p>
-                    <p className="text-[11px] text-indigo-500 font-medium mt-1">
+                  <div className="px-3.5 py-2.5" style={{ borderBottom: `1px solid ${S.dividerBorder}` }}>
+                    <p className="text-sm font-semibold" style={{ color: S.panelName }}>{user?.name}</p>
+                    <p className="text-xs truncate mt-0.5" style={{ color: S.panelEmail }}>{user?.email}</p>
+                    <p className="text-[11px] font-medium mt-1" style={{ color: S.panelRole }}>
                       {isCA ? 'Chartered Accountant' : isClient ? 'Client' : 'Staff Member'}
                     </p>
                   </div>
                   <NavLink to="/profile" onClick={() => setUserOpen(false)}
-                    className="flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                    <RiUser3Line className="text-gray-400" /> Profile &amp; settings
+                    className={`flex items-center gap-2.5 px-3.5 py-2.5 text-sm transition-colors ${S.panelLink}`}>
+                    <RiUser3Line className="opacity-60" /> Profile &amp; settings
                   </NavLink>
-                  <div className="border-t border-gray-50 mt-0.5 pt-0.5">
+                  <div style={{ borderTop: `1px solid ${S.dividerBorder}` }} className="mt-0.5 pt-0.5">
                     <button onClick={handleLogout}
-                      className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                      className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm transition-colors ${S.panelLogout}`}>
                       <RiLogoutBoxLine /> Sign out
                     </button>
                   </div>
@@ -400,9 +444,9 @@ export default function Sidebar() {
             </AnimatePresence>
           </div>
 
-          {/* Mobile hamburger */}
+          
           <button
-            className="md:hidden p-1.5 rounded-md hover:bg-gray-100 text-gray-500 transition-colors"
+            className={`md:hidden p-1.5 rounded-md transition-colors ${S.mobileHamburger}`}
             onClick={() => setMobileOpen(v => !v)}
           >
             {mobileOpen ? <RiCloseLine className="text-lg" /> : <RiMenuLine className="text-lg" />}
@@ -410,7 +454,7 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* Mobile nav */}
+      
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
@@ -418,7 +462,8 @@ export default function Sidebar() {
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.18 }}
-            className="md:hidden overflow-hidden border-t border-gray-100 bg-white"
+            className="md:hidden overflow-hidden border-t"
+            style={S.mobileNav}
           >
             <div className="px-4 py-2 space-y-0.5">
               {links.map(renderMobileLink)}

@@ -61,7 +61,6 @@ const uploadDocument = async (req, res) => {
       if (!hasAccess) return res.status(403).json({ message: 'Access denied' });
     }
 
-    // Upload buffer to Cloudinary
     const safeName = req.file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_');
     const cloudResult = await uploadToCloudinary(req.file.buffer, {
       folder: `ca-portal/${clientId}`,
@@ -98,7 +97,6 @@ const uploadDocument = async (req, res) => {
   }
 };
 
-// Returns the Cloudinary URL so the frontend can download directly
 const downloadDocument = async (req, res) => {
   try {
     const document = await Document.findOne({ _id: req.params.id, tenantId: req.tenantId });
@@ -126,7 +124,6 @@ const deleteDocument = async (req, res) => {
     const isOwner = document.uploadedBy.toString() === req.user._id.toString();
     if (req.user.role !== 'ca' && !isOwner) return res.status(403).json({ message: 'Access denied' });
 
-    // Delete from Cloudinary
     try {
       await cloudinary.uploader.destroy(document.publicId, { resource_type: 'raw' });
     } catch (e) {

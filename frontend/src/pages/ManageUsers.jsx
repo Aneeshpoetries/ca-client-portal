@@ -48,7 +48,7 @@ export default function ManageUsers() {
     <Layout>
       <div className="max-w-5xl mx-auto">
 
-        {/* ── Header ──────────────────────────────── */}
+        
         <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} className="flex items-start justify-between mb-8">
           <div>
             <h1 className="page-title">Staff</h1>
@@ -59,7 +59,7 @@ export default function ManageUsers() {
           </button>
         </motion.div>
 
-        {/* ── Table ───────────────────────────────── */}
+        
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.08 }} className="card overflow-hidden">
           {loading ? (
             <div className="divide-y divide-gray-50">
@@ -117,7 +117,7 @@ export default function ManageUsers() {
         </motion.div>
       </div>
 
-      {/* ── Modal ───────────────────────────────── */}
+      
       <AnimatePresence>
         {showModal && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}

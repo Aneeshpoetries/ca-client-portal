@@ -13,7 +13,6 @@ const protect = async (req, res, next) => {
     req.user = await User.findById(decoded.id).select('-password');
     if (!req.user || !req.user.isActive) return res.status(401).json({ message: 'User not found or deactivated' });
 
-    // CA's tenantId is their own _id; staff/clients carry tenantId pointing to their CA
     req.tenantId = req.user.role === 'ca' ? req.user._id : req.user.tenantId;
 
     next();

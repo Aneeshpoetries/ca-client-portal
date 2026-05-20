@@ -7,7 +7,6 @@ const userSchema = new mongoose.Schema({
   googleId: { type: String, select: false },
   password: { type: String, minlength: 6, select: false },
   role: { type: String, enum: ['ca', 'staff', 'client'], default: 'staff' },
-  // For staff/client: points to their CA's _id. For CA: not set (use their own _id as tenantId).
   tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', index: true },
   linkedClient: { type: mongoose.Schema.Types.ObjectId, ref: 'Client' },
   assignedClients: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Client' }],

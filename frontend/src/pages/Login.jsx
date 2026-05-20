@@ -9,14 +9,22 @@ import {
   RiMailLine, RiLockLine, RiEyeLine, RiEyeOffLine,
   RiUser3Line, RiPhoneLine, RiCheckLine,
 } from 'react-icons/ri';
+import ParticleField from '../components/ParticleField';
+import { useTheme } from '../context/ThemeContext';
 
-// ── Sub-components (preserved) ────────────────────────────────────────────────
-function GoogleButton({ onClick, label }) {
+function GoogleButton({ onClick, label, isDark }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="w-full flex items-center justify-center gap-3 px-4 py-2.5 border border-[#e1e7ef] rounded-[10px] text-sm font-medium text-[#0d1117] hover:bg-[#f4f6fa] hover:border-[#c8d0dc] transition-all"
+      className="w-full flex items-center justify-center gap-3 px-4 py-2.5 rounded-[10px] text-sm font-medium transition-all"
+      style={{
+        border: `1px solid ${isDark ? '#2c3c34' : '#e1e7ef'}`,
+        color: isDark ? '#ece9e4' : '#0d1117',
+        background: isDark ? '#1a2420' : 'transparent',
+      }}
+      onMouseEnter={e => { e.currentTarget.style.background = isDark ? '#202c28' : '#f4f6fa'; }}
+      onMouseLeave={e => { e.currentTarget.style.background = isDark ? '#1a2420' : 'transparent'; }}
     >
       <svg width="18" height="18" viewBox="0 0 24 24">
         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -29,17 +37,16 @@ function GoogleButton({ onClick, label }) {
   );
 }
 
-function Divider() {
+function Divider({ isDark }) {
   return (
     <div className="flex items-center gap-3 my-5">
-      <div className="flex-1 h-px bg-[#e1e7ef]" />
-      <span className="text-xs text-[#8896a4] font-medium">or</span>
-      <div className="flex-1 h-px bg-[#e1e7ef]" />
+      <div className="flex-1 h-px" style={{ background: isDark ? '#2c3c34' : '#e1e7ef' }} />
+      <span className="text-xs font-medium" style={{ color: isDark ? '#6a8880' : '#8896a4' }}>or</span>
+      <div className="flex-1 h-px" style={{ background: isDark ? '#2c3c34' : '#e1e7ef' }} />
     </div>
   );
 }
 
-// ── Login page ────────────────────────────────────────────────────────────────
 export default function Login() {
   const [tab, setTab]               = useState('signin');
   const [signInForm, setSignInForm] = useState({ email: '', password: '' });
@@ -47,6 +54,7 @@ export default function Login() {
   const [loading, setLoading]       = useState(false);
   const { login, googleLogin }      = useAuth();
   const navigate                    = useNavigate();
+  const { isDark }                  = useTheme();
 
   const handleSignIn = async (e) => {
     e.preventDefault();
@@ -60,10 +68,10 @@ export default function Login() {
     } finally { setLoading(false); }
   };
 
-  const handleGoogleSuccess = async (credentialResponse) => {
+  const handleGoogleSuccess = async (tokenResponse) => {
     setLoading(true);
     try {
-      const user = await googleLogin(credentialResponse.credential);
+      const user = await googleLogin(tokenResponse.access_token);
       toast.success('Signed in with Google!');
       navigate(user.role === 'client' ? '/portal' : '/dashboard');
     } catch (err) {
@@ -89,79 +97,99 @@ export default function Login() {
   return (
     <div className="min-h-screen flex">
 
-      {/* ── Left panel ──────────────────────────────────────────────────────── */}
+      
       <div
         className="hidden lg:flex w-5/12 flex-col justify-between p-12 relative overflow-hidden"
-        style={{ background: 'linear-gradient(160deg, #0f172a 0%, #1e1b4b 100%)' }}
+        style={{ background: 'linear-gradient(160deg, #071410 0%, #0d2219 50%, #0e2c1e 100%)' }}
       >
-        {/* Dot-grid SVG overlay */}
+        
+        <ParticleField count={160} />
+
+        
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px)`,
-            backgroundSize: '20px 20px',
+            background: 'linear-gradient(160deg, rgba(4,14,10,0.75) 0%, rgba(8,26,16,0.68) 100%)',
+            zIndex: 1,
           }}
         />
 
-        {/* Brand */}
-        <div className="relative flex items-center gap-2.5">
+        
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.022) 1px, transparent 1px)`,
+            backgroundSize: '24px 24px',
+            zIndex: 1,
+          }}
+        />
+
+        
+        <div className="relative z-[2] flex items-center gap-2.5">
           <div
             className="w-8 h-8 rounded-lg flex items-center justify-center"
-            style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }}
+            style={{ background: 'linear-gradient(135deg, #148a74, #0e5c4f)' }}
           >
             <span className="text-white text-xs font-bold">CA</span>
           </div>
           <span className="text-white font-semibold tracking-tight">Portal</span>
         </div>
 
-        {/* Headline + features */}
-        <div className="relative">
+        
+        <div className="relative z-[2]">
           <h2
             className="text-white font-extrabold mb-4"
             style={{ fontSize: 32, lineHeight: 1.2, letterSpacing: '-0.02em' }}
           >
             Built for modern<br />CA practices.
           </h2>
-          <p className="text-gray-400 text-sm leading-relaxed max-w-xs mb-10">
+          <p className="text-sm leading-relaxed max-w-xs mb-10" style={{ color: '#94c8b8' }}>
             Manage clients, documents, GST returns, and your team — all in one place.
           </p>
           <div className="space-y-3.5">
             {FEATURES.map(f => (
               <div key={f} className="flex items-center gap-3">
-                <div className="w-5 h-5 rounded-md bg-indigo-500/20 flex items-center justify-center flex-shrink-0">
-                  <RiCheckLine className="text-indigo-400 text-xs" />
+                <div className="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0"
+                  style={{ background: 'rgba(20,138,116,0.22)' }}>
+                  <RiCheckLine className="text-xs" style={{ color: '#4dd4b0' }} />
                 </div>
-                <span className="text-sm text-gray-300">{f}</span>
+                <span className="text-sm" style={{ color: '#d0e8e0' }}>{f}</span>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Footer */}
-        <p className="relative text-gray-600 text-xs">© 2025 CA Portal</p>
+        
+        <p className="relative z-[2] text-xs" style={{ color: '#2d5c48' }}>© 2025 CA Portal</p>
       </div>
 
-      {/* ── Right panel ─────────────────────────────────────────────────────── */}
-      <div className="flex-1 flex items-center justify-center p-8 bg-white">
+      
+      <div
+        className="flex-1 flex items-center justify-center p-8"
+        style={{ background: isDark ? '#141c18' : '#ffffff' }}
+      >
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
           className="w-full max-w-sm"
         >
-          {/* Mobile brand */}
+          
           <div className="lg:hidden flex items-center gap-2 mb-10">
             <div
               className="w-7 h-7 rounded-lg flex items-center justify-center"
-              style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }}
+              style={{ background: 'linear-gradient(135deg, #148a74, #0e5c4f)' }}
             >
               <span className="text-white text-xs font-bold">CA</span>
             </div>
-            <span className="font-semibold text-[#0d1117]">Portal</span>
+            <span className="font-semibold" style={{ color: isDark ? '#ece9e4' : '#0d1117' }}>Portal</span>
           </div>
 
-          {/* Tab toggle — pill style */}
-          <div className="flex bg-[#f4f6fa] rounded-xl p-1 mb-8">
+          
+          <div
+            className="flex rounded-xl p-1 mb-8"
+            style={{ background: isDark ? '#1a2420' : '#f4f6fa' }}
+          >
             {[
               { key: 'signin', label: 'Sign in' },
               { key: 'signup', label: 'Sign up' },
@@ -169,11 +197,11 @@ export default function Login() {
               <button
                 key={t.key}
                 onClick={() => setTab(t.key)}
-                className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
-                  tab === t.key
-                    ? 'bg-white text-[#0d1117] shadow-sm'
-                    : 'text-[#8896a4] hover:text-[#4a5568]'
-                }`}
+                className="flex-1 py-2 rounded-lg text-sm font-semibold transition-all"
+                style={tab === t.key
+                  ? { background: isDark ? '#141c18' : '#fff', color: isDark ? '#ece9e4' : '#0d1117', boxShadow: '0 1px 3px rgba(0,0,0,0.12)' }
+                  : { color: isDark ? '#6a8880' : '#8896a4' }
+                }
               >
                 {t.label}
               </button>
@@ -189,12 +217,12 @@ export default function Login() {
                 exit={{ opacity: 0, x: 8 }}
                 transition={{ duration: 0.18 }}
               >
-                <GoogleButton onClick={handleGoogleClick} label="Continue with Google" />
-                <Divider />
+                <GoogleButton onClick={handleGoogleClick} label="Continue with Google" isDark={isDark} />
+                <Divider isDark={isDark} />
 
                 <form onSubmit={handleSignIn} className="space-y-4">
                   <div>
-                    <label className="block text-xs font-semibold text-[#4a5568] mb-1.5">
+                    <label className="block text-xs font-semibold mb-1.5" style={{ color: isDark ? '#b0c0b8' : '#4a5568' }}>
                       Email address
                     </label>
                     <div className="relative">
@@ -212,7 +240,7 @@ export default function Login() {
                   </div>
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
-                      <label className="block text-xs font-semibold text-[#4a5568]">
+                      <label className="block text-xs font-semibold" style={{ color: isDark ? '#b0c0b8' : '#4a5568' }}>
                         Password
                       </label>
                       <Link
@@ -254,7 +282,7 @@ export default function Login() {
                   </button>
                 </form>
 
-                <p className="text-center text-xs text-[#c8d0dc] mt-6">
+                <p className="text-center text-xs mt-6" style={{ color: isDark ? '#3d5448' : '#c8d0dc' }}>
                   Contact your CA to get access.
                 </p>
               </motion.div>
@@ -266,9 +294,9 @@ export default function Login() {
                 exit={{ opacity: 0, x: -8 }}
                 transition={{ duration: 0.18 }}
               >
-                <GoogleButton onClick={handleGoogleClick} label="Sign up with Google" />
-                <Divider />
-                <SignUpForm loading={loading} setLoading={setLoading} navigate={navigate} />
+                <GoogleButton onClick={handleGoogleClick} label="Sign up with Google" isDark={isDark} />
+                <Divider isDark={isDark} />
+                <SignUpForm loading={loading} setLoading={setLoading} navigate={navigate} isDark={isDark} />
               </motion.div>
             )}
           </AnimatePresence>
@@ -278,8 +306,7 @@ export default function Login() {
   );
 }
 
-// ── SignUpForm (logic preserved) ──────────────────────────────────────────────
-function SignUpForm({ loading, setLoading, navigate }) {
+function SignUpForm({ loading, setLoading, navigate, isDark }) {
   const [form, setForm]         = useState({ name: '', email: '', password: '', phone: '' });
   const [showPass, setShowPass] = useState(false);
   const { register }            = useAuth();
@@ -305,7 +332,7 @@ function SignUpForm({ loading, setLoading, navigate }) {
         { key: 'phone', label: 'Phone',         icon: RiPhoneLine, type: 'tel',   ph: '+91 XXXXX XXXXX', req: false },
       ].map(({ key, label, icon: Icon, type, ph, req }) => (
         <div key={key}>
-          <label className="block text-xs font-semibold text-[#4a5568] mb-1.5">{label}</label>
+          <label className="block text-xs font-semibold mb-1.5" style={{ color: isDark ? '#b0c0b8' : '#4a5568' }}>{label}</label>
           <div className="relative">
             <Icon className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8896a4] text-sm" />
             <input
@@ -320,7 +347,7 @@ function SignUpForm({ loading, setLoading, navigate }) {
         </div>
       ))}
       <div>
-        <label className="block text-xs font-semibold text-[#4a5568] mb-1.5">Password</label>
+        <label className="block text-xs font-semibold mb-1.5" style={{ color: isDark ? '#b0c0b8' : '#4a5568' }}>Password</label>
         <div className="relative">
           <RiLockLine className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8896a4] text-sm" />
           <input
@@ -351,7 +378,7 @@ function SignUpForm({ loading, setLoading, navigate }) {
           'Create account'
         )}
       </button>
-      <p className="text-xs text-[#8896a4] text-center">
+      <p className="text-xs text-center" style={{ color: isDark ? '#6a8880' : '#8896a4' }}>
         Creating a new CA portal account. Staff and client accounts are added by the CA from inside
         the portal.
       </p>

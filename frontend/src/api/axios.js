@@ -3,8 +3,6 @@ import axios from 'axios';
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '/api',
   withCredentials: true,
-  // No default Content-Type — axios sets it automatically per request
-  // (application/json for objects, multipart/form-data for FormData)
 });
 
 api.interceptors.response.use(

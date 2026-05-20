@@ -43,7 +43,7 @@ export default function Setup() {
 
   return (
     <div className="min-h-screen flex">
-      {/* Left panel */}
+      
       <div className="hidden lg:flex w-5/12 bg-gray-950 flex-col justify-between p-12">
         <div className="flex items-center gap-2.5">
           <div className="w-7 h-7 rounded-lg bg-white flex items-center justify-center">
@@ -68,7 +68,7 @@ export default function Setup() {
         <p className="text-gray-600 text-xs">© 2025 CA Portal. All rights reserved.</p>
       </div>
 
-      {/* Right panel */}
+      
       <div className="flex-1 flex items-center justify-center p-8 bg-white">
         <motion.div
           initial={{ opacity: 0, y: 12 }}

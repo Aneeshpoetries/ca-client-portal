@@ -14,7 +14,6 @@ const fileFilter = (req, file, cb) => {
   else cb(new Error('Invalid file type. Allowed: PDF, Excel, Images, Word, CSV'), false);
 };
 
-// Buffer in memory — controller uploads to Cloudinary manually
 const upload = multer({
   storage: multer.memoryStorage(),
   fileFilter,

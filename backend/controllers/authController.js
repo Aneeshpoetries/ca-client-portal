@@ -1,9 +1,20 @@
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const { OAuth2Client } = require('google-auth-library');
+const https = require('https');
 const User = require('../models/User');
 
-const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const fetchGoogleUser = (accessToken) => new Promise((resolve, reject) => {
+  const req = https.request(
+    { hostname: 'www.googleapis.com', path: '/oauth2/v3/userinfo', headers: { Authorization: `Bearer ${accessToken}` } },
+    (res) => {
+      let body = '';
+      res.on('data', c => body += c);
+      res.on('end', () => res.statusCode === 200 ? resolve(JSON.parse(body)) : reject(new Error('Invalid token')));
+    }
+  );
+  req.on('error', reject);
+  req.end();
+});
 
 const generateToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '7d' });
 
@@ -16,11 +27,9 @@ const setTokenCookie = (res, token) => {
 };
 
 const getSetupStatus = async (req, res) => {
-  // Always returns false in multi-tenant mode — setup is always available
   res.json({ isSetupComplete: false });
 };
 
-// Any new user registering via this endpoint becomes a CA (tenant)
 const register = async (req, res) => {
   try {
     const { name, email, password, phone } = req.body;
@@ -147,20 +156,17 @@ const resetPassword = async (req, res) => {
   }
 };
 
-// Google OAuth — new Google users become CA (their own tenant); existing users log in
 const googleAuth = async (req, res) => {
   try {
-    const { credential } = req.body;
-    if (!credential) return res.status(400).json({ message: 'Google credential missing' });
+    const { access_token } = req.body;
+    if (!access_token) return res.status(400).json({ message: 'Google credential missing' });
 
-    const ticket = await googleClient.verifyIdToken({ idToken: credential, audience: process.env.GOOGLE_CLIENT_ID });
-    const { sub: googleId, email, name } = ticket.getPayload();
+    const { sub: googleId, email, name } = await fetchGoogleUser(access_token);
 
     let user = await User.findOne({ googleId }).select('+googleId') ||
                await User.findOne({ email }).select('+googleId');
 
     if (!user) {
-      // New Google sign-in → create as CA
       user = await User.create({ name, email, googleId, role: 'ca' });
     } else {
       if (!user.googleId) { user.googleId = googleId; await user.save({ validateBeforeSave: false }); }

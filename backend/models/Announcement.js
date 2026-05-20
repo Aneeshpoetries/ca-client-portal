@@ -13,4 +13,6 @@ const announcementSchema = new mongoose.Schema({
   publishedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
 }, { timestamps: true });
 
+announcementSchema.index({ createdAt: 1 }, { expireAfterSeconds: 604800 });
+
 module.exports = mongoose.model('Announcement', announcementSchema);

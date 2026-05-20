@@ -41,13 +41,13 @@ export default function Profile() {
     <Layout>
       <div className="max-w-2xl mx-auto space-y-8">
 
-        {/* ── Header ──────────────────────────────── */}
+        
         <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="page-title">Profile</h1>
           <p className="text-sm text-gray-400 mt-1">Manage your account settings</p>
         </motion.div>
 
-        {/* ── Identity card ───────────────────────── */}
+        
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.06 }}
           className="card px-6 py-5 flex items-center gap-4">
           <div className="avatar w-14 h-14 text-2xl flex-shrink-0">
@@ -64,7 +64,7 @@ export default function Profile() {
           </div>
         </motion.div>
 
-        {/* ── Personal info ────────────────────────── */}
+        
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} className="card overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-100">
             <h2 className="text-sm font-semibold text-gray-900">Personal information</h2>
@@ -100,7 +100,7 @@ export default function Profile() {
           </form>
         </motion.div>
 
-        {/* ── Password ─────────────────────────────── */}
+        
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.14 }} className="card overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-100">
             <h2 className="text-sm font-semibold text-gray-900">Change password</h2>
