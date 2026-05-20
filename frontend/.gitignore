@@ -1,0 +1,7 @@
+# Frontend-specific ignores (root .gitignore covers most)
+node_modules/
+.env
+.env.local
+dist/
+build/
+*.local
