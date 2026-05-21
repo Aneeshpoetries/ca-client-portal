@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useEffect, useState, useRef } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import Layout from '../components/Layout';
@@ -11,7 +11,7 @@ import {
   RiArrowLeftLine, RiBuilding2Line, RiMailLine, RiPhoneLine,
   RiUploadCloudLine, RiCloseLine, RiFileTextLine, RiShieldLine,
   RiCalendarLine, RiUser3Line, RiMapPinLine, RiFileChartLine,
-  RiKeyLine, RiDeleteBinLine, RiLockLine, RiEyeLine, RiEyeOffLine,
+  RiKeyLine, RiDeleteBinLine, RiLockLine, RiEyeLine, RiEyeOffLine, RiAlertLine,
 } from 'react-icons/ri';
 
 const CURRENT_YEAR = new Date().getFullYear();
@@ -46,6 +46,7 @@ const TABS = [
 export default function ClientDetail() {
   const { id } = useParams();
   const { isCA } = useAuth();
+  const navigate = useNavigate();
   const [client, setClient] = useState(null);
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -62,6 +63,9 @@ export default function ClientDetail() {
   const [loginForm, setLoginForm] = useState({ email: '', password: '' });
   const [showPass, setShowPass] = useState(false);
   const [savingLogin, setSavingLogin] = useState(false);
+  const loginInFlight = useRef(false);
+  const [showDeleteClient, setShowDeleteClient] = useState(false);
+  const [deletingClient, setDeletingClient] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -80,8 +84,10 @@ export default function ClientDetail() {
 
   const handleCreateLogin = async (e) => {
     e.preventDefault();
+    if (loginInFlight.current) return;
     if (!loginForm.email || !loginForm.password) return toast.error('Email and password required');
     if (loginForm.password.length < 6) return toast.error('Password must be at least 6 characters');
+    loginInFlight.current = true;
     setSavingLogin(true);
     try {
       const { data } = await api.post(`/users/client-login/${id}`, loginForm);
@@ -90,7 +96,19 @@ export default function ClientDetail() {
       setLoginForm({ email: '', password: '' });
       toast.success('Client login created');
     } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
-    finally { setSavingLogin(false); }
+    finally { loginInFlight.current = false; setSavingLogin(false); }
+  };
+
+  const handlePermanentDeleteClient = async () => {
+    setDeletingClient(true);
+    try {
+      await api.delete(`/clients/${id}/permanent`);
+      toast.success('Client removed permanently');
+      navigate('/clients');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to remove client');
+      setDeletingClient(false);
+    }
   };
 
   const handleDeleteLogin = async () => {
@@ -213,7 +231,7 @@ export default function ClientDetail() {
               </div>
             </div>
 
-            <div className="flex gap-2 flex-shrink-0">
+            <div className="flex gap-2 flex-shrink-0 flex-wrap">
               {isCA && (
                 <button onClick={() => { setUploadForm({ ...emptyUpload, category: 'gst_return' }); setShowReturn(true); }} className="btn-accent">
                   <RiFileChartLine /> File Return
@@ -222,6 +240,14 @@ export default function ClientDetail() {
               <button onClick={() => setShowUpload(true)} className="btn-primary">
                 <RiUploadCloudLine /> Upload
               </button>
+              {isCA && (
+                <button
+                  onClick={() => setShowDeleteClient(true)}
+                  className="flex items-center gap-1.5 text-sm px-3 py-2 rounded-xl border border-red-200 text-red-500 hover:bg-red-50 transition-colors font-medium"
+                >
+                  <RiDeleteBinLine /> Remove
+                </button>
+              )}
             </div>
           </div>
 
@@ -515,7 +541,51 @@ export default function ClientDetail() {
         )}
       </AnimatePresence>
 
-      
+
+      <AnimatePresence>
+        {showDeleteClient && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{ background: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(4px)' }}
+            onClick={e => e.target === e.currentTarget && !deletingClient && setShowDeleteClient(false)}>
+            <motion.div initial={{ scale: 0.95, opacity: 0, y: 12 }} animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0 }} transition={{ duration: 0.18 }}
+              className="bg-white rounded-2xl w-full max-w-sm shadow-2xl border border-gray-100">
+              <div className="px-6 pt-6 pb-4 flex flex-col items-center text-center">
+                <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center mb-4">
+                  <RiAlertLine className="text-2xl text-red-500" />
+                </div>
+                <h2 className="text-base font-semibold text-gray-900">Remove client permanently?</h2>
+                <p className="text-sm text-gray-500 mt-2">
+                  <span className="font-medium text-gray-800">{client?.name}</span> and all their data will be deleted — including{' '}
+                  <span className="font-medium text-gray-800">{documents.length} document{documents.length !== 1 ? 's' : ''}</span>, portal access, and staff assignments. This cannot be undone.
+                </p>
+              </div>
+              <div className="flex gap-3 px-6 pb-6">
+                <button
+                  onClick={() => setShowDeleteClient(false)}
+                  disabled={deletingClient}
+                  className="btn-secondary flex-1"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handlePermanentDeleteClient}
+                  disabled={deletingClient}
+                  className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-semibold transition-colors"
+                >
+                  {deletingClient
+                    ? <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                    : <><RiDeleteBinLine /> Remove client</>
+                  }
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+
       <AnimatePresence>
         {showUpload && (
           <motion.div

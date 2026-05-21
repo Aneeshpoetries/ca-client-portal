@@ -100,4 +100,22 @@ const deleteClientLogin = async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 };
 
-module.exports = { getUsers, createUser, updateUser, deleteUser, getClientLogin, createClientLogin, deleteClientLogin };
+const permanentDeleteUser = async (req, res) => {
+  try {
+    const user = await User.findOne({ _id: req.params.id, tenantId: req.tenantId, role: 'staff' });
+    if (!user) return res.status(404).json({ message: 'Staff member not found' });
+
+    await Client.updateMany(
+      { tenantId: req.tenantId, assignedStaff: user._id },
+      { $pull: { assignedStaff: user._id } }
+    );
+
+    await User.findByIdAndDelete(user._id);
+
+    res.json({ success: true, message: 'Staff member permanently deleted' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { getUsers, createUser, updateUser, deleteUser, getClientLogin, createClientLogin, deleteClientLogin, permanentDeleteUser };

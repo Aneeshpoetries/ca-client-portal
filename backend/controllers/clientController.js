@@ -1,6 +1,7 @@
 const Client = require('../models/Client');
 const User = require('../models/User');
 const Document = require('../models/Document');
+const { cloudinary } = require('../config/cloudinary');
 
 const getClients = async (req, res) => {
   try {
@@ -119,4 +120,34 @@ const assignStaff = async (req, res) => {
   }
 };
 
-module.exports = { getClients, createClient, getClientById, updateClient, deleteClient, assignStaff };
+const permanentDeleteClient = async (req, res) => {
+  try {
+    const client = await Client.findOne({ _id: req.params.id, tenantId: req.tenantId });
+    if (!client) return res.status(404).json({ message: 'Client not found' });
+
+    const documents = await Document.find({ client: client._id, tenantId: req.tenantId });
+    for (const doc of documents) {
+      try {
+        await cloudinary.uploader.destroy(doc.publicId, { resource_type: 'raw' });
+      } catch (e) {
+        console.error('Cloudinary delete error (non-fatal):', e.message);
+      }
+    }
+    await Document.deleteMany({ client: client._id, tenantId: req.tenantId });
+
+    await User.findOneAndDelete({ linkedClient: client._id, tenantId: req.tenantId, role: 'client' });
+
+    await User.updateMany(
+      { tenantId: req.tenantId, assignedClients: client._id },
+      { $pull: { assignedClients: client._id } }
+    );
+
+    await Client.findByIdAndDelete(client._id);
+
+    res.json({ success: true, message: 'Client permanently deleted' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { getClients, createClient, getClientById, updateClient, deleteClient, assignStaff, permanentDeleteClient };

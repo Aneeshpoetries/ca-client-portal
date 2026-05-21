@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import {
   RiAddLine, RiCloseLine, RiUser3Line, RiMailLine,
   RiLockLine, RiPhoneLine, RiCheckLine, RiProhibitedLine,
+  RiDeleteBinLine, RiAlertLine,
 } from 'react-icons/ri';
 
 const emptyForm = { name: '', email: '', password: '', phone: '' };
@@ -16,6 +17,8 @@ export default function ManageUsers() {
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     api.get('/users')
@@ -34,6 +37,21 @@ export default function ManageUsers() {
       toast.success('Staff account created');
     } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
     finally { setSaving(false); }
+  };
+
+  const handlePermanentDelete = async () => {
+    if (!deleteConfirm) return;
+    setDeleting(true);
+    try {
+      await api.delete(`/users/${deleteConfirm._id}/permanent`);
+      setUsers(prev => prev.filter(u => u._id !== deleteConfirm._id));
+      setDeleteConfirm(null);
+      toast.success('Staff member removed');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to remove');
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const toggleActive = async (userId, current) => {
@@ -77,7 +95,7 @@ export default function ManageUsers() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-[2fr_2fr_1fr_1fr_120px] gap-4 px-5 py-3 border-b border-gray-100">
+              <div className="grid grid-cols-[2fr_2fr_1fr_1fr_auto] gap-4 px-5 py-3 border-b border-gray-100">
                 <span className="section-label">Name</span>
                 <span className="section-label">Email</span>
                 <span className="section-label">Clients</span>
@@ -87,7 +105,7 @@ export default function ManageUsers() {
               <div className="divide-y divide-gray-50">
                 {users.map((u, i) => (
                   <motion.div key={u._id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.04 }}
-                    className="grid grid-cols-[2fr_2fr_1fr_1fr_120px] gap-4 items-center px-5 py-4 hover:bg-gray-50 transition-colors">
+                    className="grid grid-cols-[2fr_2fr_1fr_1fr_auto] gap-4 items-center px-5 py-4 hover:bg-gray-50 transition-colors">
                     <div className="flex items-center gap-3 min-w-0">
                       <div className={`avatar w-8 h-8 text-xs flex-shrink-0 ${!u.isActive ? 'opacity-40' : ''}`}>
                         {u.name.charAt(0).toUpperCase()}
@@ -99,16 +117,25 @@ export default function ManageUsers() {
                     <span className={u.isActive ? 'badge badge-green' : 'badge badge-gray'}>
                       {u.isActive ? 'Active' : 'Inactive'}
                     </span>
-                    <button
-                      onClick={() => toggleActive(u._id, u.isActive)}
-                      className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-medium transition-colors border ${
-                        u.isActive
-                          ? 'border-red-200 text-red-600 hover:bg-red-50'
-                          : 'border-green-200 text-green-700 hover:bg-green-50'
-                      }`}
-                    >
-                      {u.isActive ? <><RiProhibitedLine /> Deactivate</> : <><RiCheckLine /> Activate</>}
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => toggleActive(u._id, u.isActive)}
+                        className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-medium transition-colors border ${
+                          u.isActive
+                            ? 'border-red-200 text-red-600 hover:bg-red-50'
+                            : 'border-green-200 text-green-700 hover:bg-green-50'
+                        }`}
+                      >
+                        {u.isActive ? <><RiProhibitedLine /> Deactivate</> : <><RiCheckLine /> Activate</>}
+                      </button>
+                      <button
+                        onClick={() => setDeleteConfirm(u)}
+                        className="p-1.5 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors border border-transparent hover:border-red-100"
+                        title="Permanently remove"
+                      >
+                        <RiDeleteBinLine className="text-sm" />
+                      </button>
+                    </div>
                   </motion.div>
                 ))}
               </div>
@@ -118,6 +145,45 @@ export default function ManageUsers() {
       </div>
 
       
+      <AnimatePresence>
+        {deleteConfirm && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{ background: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(4px)' }}
+            onClick={e => e.target === e.currentTarget && !deleting && setDeleteConfirm(null)}>
+            <motion.div initial={{ scale: 0.95, opacity: 0, y: 12 }} animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0 }} transition={{ duration: 0.18 }}
+              className="bg-white rounded-2xl w-full max-w-sm shadow-2xl border border-gray-100">
+              <div className="px-6 pt-6 pb-4 flex flex-col items-center text-center">
+                <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center mb-4">
+                  <RiAlertLine className="text-2xl text-red-500" />
+                </div>
+                <h2 className="text-base font-semibold text-gray-900">Remove staff member?</h2>
+                <p className="text-sm text-gray-500 mt-2">
+                  <span className="font-medium text-gray-800">{deleteConfirm.name}</span> will be permanently removed from the portal and lose all access. This cannot be undone.
+                </p>
+              </div>
+              <div className="flex gap-3 px-6 pb-6">
+                <button
+                  onClick={() => setDeleteConfirm(null)}
+                  disabled={deleting}
+                  className="btn-secondary flex-1"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handlePermanentDelete}
+                  disabled={deleting}
+                  className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-semibold transition-colors"
+                >
+                  {deleting ? <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> : <><RiDeleteBinLine /> Remove</>}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <AnimatePresence>
         {showModal && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}

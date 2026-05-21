@@ -3,11 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../context/AuthContext';
-import api from '../api/axios';
 import toast from 'react-hot-toast';
 import {
   RiMailLine, RiLockLine, RiEyeLine, RiEyeOffLine,
-  RiUser3Line, RiPhoneLine, RiCheckLine,
+  RiUser3Line, RiPhoneLine, RiCheckLine, RiArrowLeftLine,
+  RiBriefcase4Line, RiFileUserLine,
 } from 'react-icons/ri';
 import ParticleField from '../components/ParticleField';
 import { useTheme } from '../context/ThemeContext';
@@ -47,14 +47,22 @@ function Divider({ isDark }) {
   );
 }
 
+const FEATURES = [
+  'Multi-client document management',
+  'GST returns & ITR filing tracker',
+  'Staff access control',
+  'Secure file storage',
+];
+
 export default function Login() {
-  const [tab, setTab]               = useState('signin');
-  const [signInForm, setSignInForm] = useState({ email: '', password: '' });
-  const [showPass, setShowPass]     = useState(false);
-  const [loading, setLoading]       = useState(false);
-  const { login, googleLogin }      = useAuth();
-  const navigate                    = useNavigate();
-  const { isDark }                  = useTheme();
+  const [roleView, setRoleView]      = useState(null); // null | 'ca' | 'client'
+  const [tab, setTab]                = useState('signin');
+  const [signInForm, setSignInForm]  = useState({ email: '', password: '' });
+  const [showPass, setShowPass]      = useState(false);
+  const [loading, setLoading]        = useState(false);
+  const { login, googleLogin }       = useAuth();
+  const navigate                     = useNavigate();
+  const { isDark }                   = useTheme();
 
   const handleSignIn = async (e) => {
     e.preventDefault();
@@ -85,62 +93,35 @@ export default function Login() {
     flow: 'implicit',
   });
 
-  const handleGoogleClick = () => triggerGoogle();
-
-  const FEATURES = [
-    'Multi-client document management',
-    'GST returns & ITR filing tracker',
-    'Staff access control',
-    'Secure file storage',
-  ];
+  const textColor   = isDark ? '#ece9e4' : '#0d1117';
+  const subColor    = isDark ? '#6a8880' : '#8896a4';
+  const borderColor = isDark ? '#2c3c34' : '#e1e7ef';
+  const cardBg      = isDark ? '#1a2420' : '#f9fafb';
 
   return (
     <div className="min-h-screen flex">
 
-      
+      {/* Left panel */}
       <div
         className="hidden lg:flex w-5/12 flex-col justify-between p-12 relative overflow-hidden"
         style={{ background: 'linear-gradient(160deg, #071410 0%, #0d2219 50%, #0e2c1e 100%)' }}
       >
-        
         <ParticleField count={160} />
+        <div className="absolute inset-0 pointer-events-none"
+          style={{ background: 'linear-gradient(160deg, rgba(4,14,10,0.75) 0%, rgba(8,26,16,0.68) 100%)', zIndex: 1 }} />
+        <div className="absolute inset-0 pointer-events-none"
+          style={{ backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.022) 1px, transparent 1px)`, backgroundSize: '24px 24px', zIndex: 1 }} />
 
-        
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: 'linear-gradient(160deg, rgba(4,14,10,0.75) 0%, rgba(8,26,16,0.68) 100%)',
-            zIndex: 1,
-          }}
-        />
-
-        
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.022) 1px, transparent 1px)`,
-            backgroundSize: '24px 24px',
-            zIndex: 1,
-          }}
-        />
-
-        
         <div className="relative z-[2] flex items-center gap-2.5">
-          <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center"
-            style={{ background: 'linear-gradient(135deg, #148a74, #0e5c4f)' }}
-          >
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center"
+            style={{ background: 'linear-gradient(135deg, #148a74, #0e5c4f)' }}>
             <span className="text-white text-xs font-bold">CA</span>
           </div>
           <span className="text-white font-semibold tracking-tight">Portal</span>
         </div>
 
-        
         <div className="relative z-[2]">
-          <h2
-            className="text-white font-extrabold mb-4"
-            style={{ fontSize: 32, lineHeight: 1.2, letterSpacing: '-0.02em' }}
-          >
+          <h2 className="text-white font-extrabold mb-4" style={{ fontSize: 32, lineHeight: 1.2, letterSpacing: '-0.02em' }}>
             Built for modern<br />CA practices.
           </h2>
           <p className="text-sm leading-relaxed max-w-xs mb-10" style={{ color: '#94c8b8' }}>
@@ -159,148 +140,207 @@ export default function Login() {
           </div>
         </div>
 
-        
         <p className="relative z-[2] text-xs" style={{ color: '#2d5c48' }}>© 2025 CA Portal</p>
       </div>
 
-      
-      <div
-        className="flex-1 flex items-center justify-center p-8"
-        style={{ background: isDark ? '#141c18' : '#ffffff' }}
-      >
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35 }}
-          className="w-full max-w-sm"
-        >
-          
+      {/* Right panel */}
+      <div className="flex-1 flex items-center justify-center p-8"
+        style={{ background: isDark ? '#141c18' : '#ffffff' }}>
+
+        <div className="w-full max-w-sm">
+
+          {/* Mobile logo */}
           <div className="lg:hidden flex items-center gap-2 mb-10">
-            <div
-              className="w-7 h-7 rounded-lg flex items-center justify-center"
-              style={{ background: 'linear-gradient(135deg, #148a74, #0e5c4f)' }}
-            >
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center"
+              style={{ background: 'linear-gradient(135deg, #148a74, #0e5c4f)' }}>
               <span className="text-white text-xs font-bold">CA</span>
             </div>
-            <span className="font-semibold" style={{ color: isDark ? '#ece9e4' : '#0d1117' }}>Portal</span>
-          </div>
-
-          
-          <div
-            className="flex rounded-xl p-1 mb-8"
-            style={{ background: isDark ? '#1a2420' : '#f4f6fa' }}
-          >
-            {[
-              { key: 'signin', label: 'Sign in' },
-              { key: 'signup', label: 'Sign up' },
-            ].map(t => (
-              <button
-                key={t.key}
-                onClick={() => setTab(t.key)}
-                className="flex-1 py-2 rounded-lg text-sm font-semibold transition-all"
-                style={tab === t.key
-                  ? { background: isDark ? '#141c18' : '#fff', color: isDark ? '#ece9e4' : '#0d1117', boxShadow: '0 1px 3px rgba(0,0,0,0.12)' }
-                  : { color: isDark ? '#6a8880' : '#8896a4' }
-                }
-              >
-                {t.label}
-              </button>
-            ))}
+            <span className="font-semibold" style={{ color: textColor }}>Portal</span>
           </div>
 
           <AnimatePresence mode="wait">
-            {tab === 'signin' ? (
-              <motion.div
-                key="signin"
-                initial={{ opacity: 0, x: -8 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 8 }}
-                transition={{ duration: 0.18 }}
-              >
-                <GoogleButton onClick={handleGoogleClick} label="Continue with Google" isDark={isDark} />
-                <Divider isDark={isDark} />
+
+            {/* ── STEP 1: Role selector ── */}
+            {roleView === null && (
+              <motion.div key="role-select"
+                initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.22 }}>
+
+                <h1 className="text-2xl font-bold mb-1" style={{ color: textColor }}>Welcome</h1>
+                <p className="text-sm mb-8" style={{ color: subColor }}>How would you like to continue?</p>
+
+                <div className="space-y-3">
+                  <button
+                    onClick={() => setRoleView('ca')}
+                    className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl border text-left transition-all group"
+                    style={{ borderColor, background: 'transparent' }}
+                    onMouseEnter={e => { e.currentTarget.style.background = cardBg; e.currentTarget.style.borderColor = '#148a74'; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = borderColor; }}
+                  >
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                      style={{ background: 'rgba(20,138,116,0.12)' }}>
+                      <RiBriefcase4Line className="text-xl" style={{ color: '#148a74' }} />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold" style={{ color: textColor }}>CA / Accountant</p>
+                      <p className="text-xs mt-0.5" style={{ color: subColor }}>Manage clients, documents & staff</p>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => setRoleView('client')}
+                    className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl border text-left transition-all"
+                    style={{ borderColor, background: 'transparent' }}
+                    onMouseEnter={e => { e.currentTarget.style.background = cardBg; e.currentTarget.style.borderColor = '#148a74'; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = borderColor; }}
+                  >
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                      style={{ background: 'rgba(20,138,116,0.12)' }}>
+                      <RiFileUserLine className="text-xl" style={{ color: '#148a74' }} />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold" style={{ color: textColor }}>Client</p>
+                      <p className="text-xs mt-0.5" style={{ color: subColor }}>Access your documents & returns</p>
+                    </div>
+                  </button>
+                </div>
+              </motion.div>
+            )}
+
+            {/* ── STEP 2a: CA login/signup ── */}
+            {roleView === 'ca' && (
+              <motion.div key="ca-view"
+                initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.22 }}>
+
+                <button onClick={() => setRoleView(null)}
+                  className="flex items-center gap-1.5 text-xs font-medium mb-6 transition-colors"
+                  style={{ color: subColor }}
+                  onMouseEnter={e => e.currentTarget.style.color = textColor}
+                  onMouseLeave={e => e.currentTarget.style.color = subColor}>
+                  <RiArrowLeftLine /> Back
+                </button>
+
+                {/* Sign in / Sign up tabs */}
+                <div className="flex rounded-xl p-1 mb-8"
+                  style={{ background: isDark ? '#1a2420' : '#f4f6fa' }}>
+                  {[{ key: 'signin', label: 'Sign in' }, { key: 'signup', label: 'Sign up' }].map(t => (
+                    <button key={t.key} onClick={() => setTab(t.key)}
+                      className="flex-1 py-2 rounded-lg text-sm font-semibold transition-all"
+                      style={tab === t.key
+                        ? { background: isDark ? '#141c18' : '#fff', color: textColor, boxShadow: '0 1px 3px rgba(0,0,0,0.12)' }
+                        : { color: subColor }}>
+                      {t.label}
+                    </button>
+                  ))}
+                </div>
+
+                <AnimatePresence mode="wait">
+                  {tab === 'signin' ? (
+                    <motion.div key="ca-signin"
+                      initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 8 }} transition={{ duration: 0.18 }}>
+                      <GoogleButton onClick={() => triggerGoogle()} label="Continue with Google" isDark={isDark} />
+                      <Divider isDark={isDark} />
+                      <form onSubmit={handleSignIn} className="space-y-4">
+                        <div>
+                          <label className="block text-xs font-semibold mb-1.5" style={{ color: isDark ? '#b0c0b8' : '#4a5568' }}>Email address</label>
+                          <div className="relative">
+                            <RiMailLine className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8896a4] text-sm" />
+                            <input type="email" required value={signInForm.email}
+                              onChange={e => setSignInForm({ ...signInForm, email: e.target.value })}
+                              className="input-field pl-9" placeholder="you@example.com" autoFocus />
+                          </div>
+                        </div>
+                        <div>
+                          <div className="flex items-center justify-between mb-1.5">
+                            <label className="block text-xs font-semibold" style={{ color: isDark ? '#b0c0b8' : '#4a5568' }}>Password</label>
+                            <Link to="/forgot-password" className="text-xs text-indigo-600 hover:text-indigo-700 font-medium">Forgot?</Link>
+                          </div>
+                          <div className="relative">
+                            <RiLockLine className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8896a4] text-sm" />
+                            <input type={showPass ? 'text' : 'password'} required value={signInForm.password}
+                              onChange={e => setSignInForm({ ...signInForm, password: e.target.value })}
+                              className="input-field pl-9 pr-10" placeholder="••••••••" />
+                            <button type="button" onClick={() => setShowPass(v => !v)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8896a4] hover:text-[#4a5568] transition-colors">
+                              {showPass ? <RiEyeOffLine /> : <RiEyeLine />}
+                            </button>
+                          </div>
+                        </div>
+                        <button type="submit" disabled={loading} className="btn w-full justify-center py-3 text-[15px] mt-2">
+                          {loading ? <div className="border-2 border-white/30 border-t-white rounded-full animate-spin w-4 h-4" /> : 'Sign in'}
+                        </button>
+                      </form>
+                    </motion.div>
+                  ) : (
+                    <motion.div key="ca-signup"
+                      initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -8 }} transition={{ duration: 0.18 }}>
+                      <GoogleButton onClick={() => triggerGoogle()} label="Sign up with Google" isDark={isDark} />
+                      <Divider isDark={isDark} />
+                      <SignUpForm loading={loading} setLoading={setLoading} navigate={navigate} isDark={isDark} />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            )}
+
+            {/* ── STEP 2b: Client login ── */}
+            {roleView === 'client' && (
+              <motion.div key="client-view"
+                initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.22 }}>
+
+                <button onClick={() => setRoleView(null)}
+                  className="flex items-center gap-1.5 text-xs font-medium mb-6 transition-colors"
+                  style={{ color: subColor }}
+                  onMouseEnter={e => e.currentTarget.style.color = textColor}
+                  onMouseLeave={e => e.currentTarget.style.color = subColor}>
+                  <RiArrowLeftLine /> Back
+                </button>
+
+                <h2 className="text-xl font-bold mb-1" style={{ color: textColor }}>Client sign in</h2>
+                <p className="text-sm mb-8" style={{ color: subColor }}>
+                  Use the credentials your CA shared with you.
+                </p>
 
                 <form onSubmit={handleSignIn} className="space-y-4">
                   <div>
-                    <label className="block text-xs font-semibold mb-1.5" style={{ color: isDark ? '#b0c0b8' : '#4a5568' }}>
-                      Email address
-                    </label>
+                    <label className="block text-xs font-semibold mb-1.5" style={{ color: isDark ? '#b0c0b8' : '#4a5568' }}>Email address</label>
                     <div className="relative">
                       <RiMailLine className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8896a4] text-sm" />
-                      <input
-                        type="email"
-                        required
-                        value={signInForm.email}
+                      <input type="email" required value={signInForm.email}
                         onChange={e => setSignInForm({ ...signInForm, email: e.target.value })}
-                        className="input-field pl-9"
-                        placeholder="you@example.com"
-                        autoFocus
-                      />
+                        className="input-field pl-9" placeholder="you@example.com" autoFocus />
                     </div>
                   </div>
                   <div>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <label className="block text-xs font-semibold" style={{ color: isDark ? '#b0c0b8' : '#4a5568' }}>
-                        Password
-                      </label>
-                      <Link
-                        to="/forgot-password"
-                        className="text-xs text-indigo-600 hover:text-indigo-700 font-medium"
-                      >
-                        Forgot?
-                      </Link>
-                    </div>
+                    <label className="block text-xs font-semibold mb-1.5" style={{ color: isDark ? '#b0c0b8' : '#4a5568' }}>Password</label>
                     <div className="relative">
                       <RiLockLine className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8896a4] text-sm" />
-                      <input
-                        type={showPass ? 'text' : 'password'}
-                        required
-                        value={signInForm.password}
+                      <input type={showPass ? 'text' : 'password'} required value={signInForm.password}
                         onChange={e => setSignInForm({ ...signInForm, password: e.target.value })}
-                        className="input-field pl-9 pr-10"
-                        placeholder="••••••••"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPass(v => !v)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8896a4] hover:text-[#4a5568] transition-colors"
-                      >
+                        className="input-field pl-9 pr-10" placeholder="••••••••" />
+                      <button type="button" onClick={() => setShowPass(v => !v)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8896a4] hover:text-[#4a5568] transition-colors">
                         {showPass ? <RiEyeOffLine /> : <RiEyeLine />}
                       </button>
                     </div>
                   </div>
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="btn w-full justify-center py-3 text-[15px] mt-2"
-                  >
-                    {loading ? (
-                      <div className="border-2 border-white/30 border-t-white rounded-full animate-spin w-4 h-4" />
-                    ) : (
-                      'Sign in'
-                    )}
+                  <button type="submit" disabled={loading} className="btn w-full justify-center py-3 text-[15px] mt-2">
+                    {loading ? <div className="border-2 border-white/30 border-t-white rounded-full animate-spin w-4 h-4" /> : 'Sign in'}
                   </button>
                 </form>
 
                 <p className="text-center text-xs mt-6" style={{ color: isDark ? '#3d5448' : '#c8d0dc' }}>
-                  Contact your CA to get access.
+                  Don't have credentials? Contact your CA.
                 </p>
               </motion.div>
-            ) : (
-              <motion.div
-                key="signup"
-                initial={{ opacity: 0, x: 8 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -8 }}
-                transition={{ duration: 0.18 }}
-              >
-                <GoogleButton onClick={handleGoogleClick} label="Sign up with Google" isDark={isDark} />
-                <Divider isDark={isDark} />
-                <SignUpForm loading={loading} setLoading={setLoading} navigate={navigate} isDark={isDark} />
-              </motion.div>
             )}
+
           </AnimatePresence>
-        </motion.div>
+        </div>
       </div>
     </div>
   );
@@ -335,14 +375,9 @@ function SignUpForm({ loading, setLoading, navigate, isDark }) {
           <label className="block text-xs font-semibold mb-1.5" style={{ color: isDark ? '#b0c0b8' : '#4a5568' }}>{label}</label>
           <div className="relative">
             <Icon className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8896a4] text-sm" />
-            <input
-              type={type}
-              required={req}
-              value={form[key]}
+            <input type={type} required={req} value={form[key]}
               onChange={e => setForm({ ...form, [key]: e.target.value })}
-              className="input-field pl-9"
-              placeholder={ph}
-            />
+              className="input-field pl-9" placeholder={ph} />
           </div>
         </div>
       ))}
@@ -350,37 +385,20 @@ function SignUpForm({ loading, setLoading, navigate, isDark }) {
         <label className="block text-xs font-semibold mb-1.5" style={{ color: isDark ? '#b0c0b8' : '#4a5568' }}>Password</label>
         <div className="relative">
           <RiLockLine className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8896a4] text-sm" />
-          <input
-            type={showPass ? 'text' : 'password'}
-            required
-            value={form.password}
+          <input type={showPass ? 'text' : 'password'} required value={form.password}
             onChange={e => setForm({ ...form, password: e.target.value })}
-            className="input-field pl-9 pr-10"
-            placeholder="Min 6 characters"
-          />
-          <button
-            type="button"
-            onClick={() => setShowPass(v => !v)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8896a4] hover:text-[#4a5568] transition-colors"
-          >
+            className="input-field pl-9 pr-10" placeholder="Min 6 characters" />
+          <button type="button" onClick={() => setShowPass(v => !v)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8896a4] hover:text-[#4a5568] transition-colors">
             {showPass ? <RiEyeOffLine /> : <RiEyeLine />}
           </button>
         </div>
       </div>
-      <button
-        type="submit"
-        disabled={loading}
-        className="btn w-full justify-center py-3 text-[15px] mt-2"
-      >
-        {loading ? (
-          <div className="border-2 border-white/30 border-t-white rounded-full animate-spin w-4 h-4" />
-        ) : (
-          'Create account'
-        )}
+      <button type="submit" disabled={loading} className="btn w-full justify-center py-3 text-[15px] mt-2">
+        {loading ? <div className="border-2 border-white/30 border-t-white rounded-full animate-spin w-4 h-4" /> : 'Create account'}
       </button>
       <p className="text-xs text-center" style={{ color: isDark ? '#6a8880' : '#8896a4' }}>
-        Creating a new CA portal account. Staff and client accounts are added by the CA from inside
-        the portal.
+        Creating a new CA portal account. Staff and client accounts are added by the CA from inside the portal.
       </p>
     </form>
   );
