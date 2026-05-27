@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../context/AuthContext';
@@ -9,7 +9,6 @@ import {
   RiUser3Line, RiPhoneLine, RiCheckLine, RiArrowLeftLine,
   RiBriefcase4Line, RiFileUserLine,
 } from 'react-icons/ri';
-import ParticleField from '../components/ParticleField';
 import { useTheme } from '../context/ThemeContext';
 
 function GoogleButton({ onClick, label, isDark }) {
@@ -55,7 +54,8 @@ const FEATURES = [
 ];
 
 export default function Login() {
-  const [roleView, setRoleView]      = useState(null); // null | 'ca' | 'client'
+  const [searchParams]               = useSearchParams();
+  const [roleView, setRoleView]      = useState(searchParams.get('role') || null);
   const [tab, setTab]                = useState('signin');
   const [signInForm, setSignInForm]  = useState({ email: '', password: '' });
   const [showPass, setShowPass]      = useState(false);
@@ -104,15 +104,17 @@ export default function Login() {
       {/* Left panel */}
       <div
         className="hidden lg:flex w-5/12 flex-col justify-between p-12 relative overflow-hidden"
-        style={{ background: 'linear-gradient(160deg, #071410 0%, #0d2219 50%, #0e2c1e 100%)' }}
+        style={{
+          background: `
+            radial-gradient(ellipse 90% 70% at 0% 0%, rgba(20,138,116,0.30) 0%, transparent 60%),
+            radial-gradient(ellipse 70% 55% at 100% 100%, rgba(14,92,79,0.18) 0%, transparent 55%),
+            #080e0b
+          `,
+        }}
       >
-        <ParticleField count={160} />
-        <div className="absolute inset-0 pointer-events-none"
-          style={{ background: 'linear-gradient(160deg, rgba(4,14,10,0.75) 0%, rgba(8,26,16,0.68) 100%)', zIndex: 1 }} />
-        <div className="absolute inset-0 pointer-events-none"
-          style={{ backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.022) 1px, transparent 1px)`, backgroundSize: '24px 24px', zIndex: 1 }} />
+        <div />
 
-        <div className="relative z-[2] flex items-center gap-2.5">
+        <div className="relative z-[2] flex items-center gap-2.5 select-none">
           <div className="w-8 h-8 rounded-lg flex items-center justify-center"
             style={{ background: 'linear-gradient(135deg, #148a74, #0e5c4f)' }}>
             <span className="text-white text-xs font-bold">CA</span>
@@ -150,7 +152,7 @@ export default function Login() {
         <div className="w-full max-w-sm">
 
           {/* Mobile logo */}
-          <div className="lg:hidden flex items-center gap-2 mb-10">
+          <div className="lg:hidden flex items-center gap-2 mb-10 select-none">
             <div className="w-7 h-7 rounded-lg flex items-center justify-center"
               style={{ background: 'linear-gradient(135deg, #148a74, #0e5c4f)' }}>
               <span className="text-white text-xs font-bold">CA</span>

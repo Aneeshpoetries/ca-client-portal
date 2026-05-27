@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import Layout from '../components/Layout';
 import api from '../api/axios';
 import toast from 'react-hot-toast';
@@ -29,6 +30,7 @@ const BIZ_LABEL = { proprietorship: 'Proprietorship', partnership: 'Partnership'
 
 export default function Clients() {
   const { isCA } = useAuth();
+  const { isDark } = useTheme();
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -71,7 +73,7 @@ export default function Clients() {
         <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} className="flex items-start justify-between mb-8">
           <div>
             <h1 className="page-title">{isCA ? 'Clients' : 'My Clients'}</h1>
-            <p className="text-sm text-gray-400 mt-1">{clients.length} total</p>
+            <p className="text-sm mt-1" style={{ color: 'var(--c-text-3)' }}>{clients.length} total</p>
           </div>
           {isCA && (
             <button onClick={() => setShowModal(true)} className="btn-primary">
@@ -83,7 +85,7 @@ export default function Clients() {
         
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.06 }} className="mb-6">
           <div className="relative max-w-sm">
-            <RiSearchLine className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
+            <RiSearchLine className="absolute left-3 top-1/2 -translate-y-1/2 text-sm" style={{ color: 'var(--c-text-3)' }} />
             <input
               type="text"
               value={search}
@@ -97,9 +99,9 @@ export default function Clients() {
         
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} className="card overflow-hidden">
           {loading ? (
-            <div className="divide-y divide-gray-50">
+            <div style={{ borderColor: 'var(--border-subtle)' }}>
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="flex items-center gap-4 px-5 py-4">
+                <div key={i} className="flex items-center gap-4 px-5 py-4" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
                   <div className="w-8 h-8 shimmer rounded-full flex-shrink-0" />
                   <div className="flex-1 space-y-2">
                     <div className="h-3.5 shimmer w-1/3" />
@@ -110,8 +112,8 @@ export default function Clients() {
               ))}
             </div>
           ) : filtered.length === 0 ? (
-            <div className="py-20 flex flex-col items-center text-gray-400">
-              <p className="text-sm font-medium text-gray-500">{search ? 'No results found' : 'No clients yet'}</p>
+            <div className="py-20 flex flex-col items-center" style={{ color: 'var(--c-text-3)' }}>
+              <p className="text-sm font-medium" style={{ color: 'var(--c-text-2)' }}>{search ? 'No results found' : 'No clients yet'}</p>
               {isCA && !search && (
                 <button onClick={() => setShowModal(true)} className="mt-4 btn-primary text-xs">
                   <RiAddLine /> Add your first client
@@ -120,8 +122,8 @@ export default function Clients() {
             </div>
           ) : (
             <>
-              
-              <div className="grid grid-cols-[2fr_1.5fr_1fr_1fr_40px] gap-4 px-5 py-3 border-b border-gray-100">
+
+              <div className="grid grid-cols-[2fr_1.5fr_1fr_1fr_40px] gap-4 px-5 py-3" style={{ borderBottom: '1px solid var(--c-border)' }}>
                 <span className="section-label">Name</span>
                 <span className="section-label">GSTIN / PAN</span>
                 <span className="section-label">Type</span>
@@ -129,52 +131,56 @@ export default function Clients() {
                 <span />
               </div>
 
-              <div className="divide-y divide-gray-50">
+              <div>
                 {filtered.map((client, i) => (
                   <motion.div
                     key={client._id}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: i * 0.03 }}
+                    style={{ borderBottom: '1px solid var(--border-subtle)' }}
                   >
                     <Link
                       to={`/clients/${client._id}`}
-                      className="grid grid-cols-[2fr_1.5fr_1fr_1fr_40px] gap-4 items-center px-5 py-4 hover:bg-gray-50 transition-colors group"
+                      className="grid grid-cols-[2fr_1.5fr_1fr_1fr_40px] gap-4 items-center px-5 py-4 transition-colors group"
+                      style={{ textDecoration: 'none' }}
+                      onMouseEnter={e => e.currentTarget.style.background = isDark ? 'rgba(22,34,52,0.40)' : '#f8fafc'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                     >
-                      
+
                       <div className="flex items-center gap-3 min-w-0">
                         <div className="avatar w-8 h-8 text-xs flex-shrink-0">
                           {client.name.charAt(0).toUpperCase()}
                         </div>
                         <div className="min-w-0">
-                          <p className="text-sm font-medium text-gray-900 group-hover:text-indigo-600 transition-colors truncate">{client.name}</p>
+                          <p className="text-sm font-medium transition-colors truncate" style={{ color: 'var(--c-text-1)' }}>{client.name}</p>
                           {client.address?.city && (
-                            <p className="text-xs text-gray-400 flex items-center gap-1 mt-0.5">
+                            <p className="text-xs flex items-center gap-1 mt-0.5" style={{ color: 'var(--c-text-3)' }}>
                               <RiMapPinLine className="text-[10px]" /> {client.address.city}
                             </p>
                           )}
                         </div>
                       </div>
 
-                      
+
                       <div className="min-w-0">
                         {client.gstin ? (
-                          <p className="text-xs text-gray-500 font-mono truncate">{client.gstin}</p>
+                          <p className="text-xs font-mono truncate" style={{ color: 'var(--c-text-2)' }}>{client.gstin}</p>
                         ) : client.pan ? (
-                          <p className="text-xs text-gray-500 font-mono truncate">{client.pan}</p>
+                          <p className="text-xs font-mono truncate" style={{ color: 'var(--c-text-2)' }}>{client.pan}</p>
                         ) : (
-                          <span className="text-xs text-gray-300">—</span>
+                          <span className="text-xs" style={{ color: 'var(--c-text-3)' }}>—</span>
                         )}
                       </div>
 
-                      
+
                       <span className="badge badge-gray">{BIZ_LABEL[client.businessType] || 'Other'}</span>
 
-                      
-                      <span className="text-sm text-gray-500">{client.documentCount || 0}</span>
 
-                      
-                      <RiArrowRightLine className="text-gray-300 group-hover:text-indigo-400 transition-colors" />
+                      <span className="text-sm" style={{ color: 'var(--c-text-2)' }}>{client.documentCount || 0}</span>
+
+
+                      <RiArrowRightLine style={{ color: 'var(--c-border-strong)' }} className="transition-colors group-hover:opacity-100" />
                     </Link>
                   </motion.div>
                 ))}
@@ -200,14 +206,16 @@ export default function Clients() {
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0 }}
               transition={{ duration: 0.18 }}
-              className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100"
+              className="glass-panel rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
             >
-              <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
+              <div className="flex items-center justify-between px-6 py-5" style={{ borderBottom: '1px solid var(--c-border)' }}>
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900">New client</h2>
-                  <p className="text-xs text-gray-400 mt-0.5">Add a new client to your portal</p>
+                  <h2 className="text-lg font-semibold" style={{ color: 'var(--c-text-1)' }}>New client</h2>
+                  <p className="text-xs mt-0.5" style={{ color: 'var(--c-text-3)' }}>Add a new client to your portal</p>
                 </div>
-                <button onClick={() => setShowModal(false)} className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors text-gray-400">
+                <button onClick={() => setShowModal(false)} className="p-1.5 rounded-lg transition-colors" style={{ color: 'var(--c-text-3)' }}
+                  onMouseEnter={e => e.currentTarget.style.background = 'var(--c-surface-2)'}
+                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                   <RiCloseLine className="text-lg" />
                 </button>
               </div>
@@ -215,7 +223,7 @@ export default function Clients() {
               <form onSubmit={handleCreate} className="px-6 py-5 space-y-5">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="sm:col-span-2">
-                    <label className="block text-xs font-semibold text-gray-500 mb-1.5">Client name *</label>
+                    <label className="block text-xs font-semibold mb-1.5" style={{ color: 'var(--c-text-3)' }}>Client name *</label>
                     <input required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="input-field" placeholder="Full name or business name" />
                   </div>
                   {[
@@ -226,31 +234,31 @@ export default function Clients() {
                     { key: 'industry', label: 'Industry', ph: 'e.g. Manufacturing' },
                   ].map(({ key, label, ph, type }) => (
                     <div key={key}>
-                      <label className="block text-xs font-semibold text-gray-500 mb-1.5">{label}</label>
+                      <label className="block text-xs font-semibold mb-1.5" style={{ color: 'var(--c-text-3)' }}>{label}</label>
                       <input type={type || 'text'} value={form[key]} onChange={e => setForm({ ...form, [key]: e.target.value })} className="input-field" placeholder={ph} />
                     </div>
                   ))}
                   <div>
-                    <label className="block text-xs font-semibold text-gray-500 mb-1.5">Business type</label>
+                    <label className="block text-xs font-semibold mb-1.5" style={{ color: 'var(--c-text-3)' }}>Business type</label>
                     <select value={form.businessType} onChange={e => setForm({ ...form, businessType: e.target.value })} className="input-field">
                       {BUSINESS_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-500 mb-1.5">City</label>
+                    <label className="block text-xs font-semibold mb-1.5" style={{ color: 'var(--c-text-3)' }}>City</label>
                     <input value={form.address.city} onChange={e => setForm({ ...form, address: { ...form.address, city: e.target.value } })} className="input-field" placeholder="Mumbai" />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-500 mb-1.5">State</label>
+                    <label className="block text-xs font-semibold mb-1.5" style={{ color: 'var(--c-text-3)' }}>State</label>
                     <input value={form.address.state} onChange={e => setForm({ ...form, address: { ...form.address, state: e.target.value } })} className="input-field" placeholder="Maharashtra" />
                   </div>
                   <div className="sm:col-span-2">
-                    <label className="block text-xs font-semibold text-gray-500 mb-1.5">Notes</label>
+                    <label className="block text-xs font-semibold mb-1.5" style={{ color: 'var(--c-text-3)' }}>Notes</label>
                     <textarea rows={2} value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} className="input-field resize-none" placeholder="Any additional notes…" />
                   </div>
                 </div>
 
-                <div className="flex gap-3 pt-1 border-t border-gray-100 mt-5">
+                <div className="flex gap-3 pt-1 mt-5" style={{ borderTop: '1px solid var(--c-border)' }}>
                   <button type="button" onClick={() => setShowModal(false)} className="btn-secondary flex-1">Cancel</button>
                   <button type="submit" disabled={saving} className="btn-primary flex-1 justify-center">
                     {saving ? <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> : 'Create client'}

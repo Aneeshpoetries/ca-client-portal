@@ -39,11 +39,11 @@ const ITR_TYPES = [
 ];
 
 const CAT_COLORS = {
-  general:    { bg: 'bg-gray-100',  text: 'text-gray-600'  },
-  gst:        { bg: 'bg-green-50',  text: 'text-green-700' },
-  itr:        { bg: 'bg-purple-50', text: 'text-purple-700'},
-  deadline:   { bg: 'bg-red-50',    text: 'text-red-700'   },
-  regulatory: { bg: 'bg-amber-50',  text: 'text-amber-700' },
+  general:    { bg: 'bg-gray-100 dark:bg-[#1a2020]',   text: 'text-gray-600 dark:text-[var(--c-text-2)]'  },
+  gst:        { bg: 'bg-green-50 dark:bg-[#182820]',   text: 'text-green-700 dark:text-[#34d399]'         },
+  itr:        { bg: 'bg-purple-50 dark:bg-[#241c38]',  text: 'text-purple-700 dark:text-[#a78bfa]'        },
+  deadline:   { bg: 'bg-red-50 dark:bg-[#2c1414]',     text: 'text-red-700 dark:text-[#f87171]'           },
+  regulatory: { bg: 'bg-amber-50 dark:bg-[#2a2010]',   text: 'text-amber-700 dark:text-[#fbbf24]'         },
 };
 
 function fmtDate(s) {
@@ -114,10 +114,11 @@ function UploadModal({ category, types, clientId, onClose, onUploaded }) {
   const [dragging,  setDragging]  = useState(false);
 
   const isGst       = category === 'gst_return';
-  const headerBg    = isGst ? 'bg-emerald-50' : 'bg-purple-50';
+  const headerBg    = isGst ? 'bg-emerald-50 dark:bg-[#182820]' : 'bg-purple-50 dark:bg-[#241c38]';
   const selectedCls = isGst
-    ? 'border-emerald-400 bg-emerald-50 text-emerald-700'
-    : 'border-purple-400 bg-purple-50 text-purple-700';
+    ? 'border-emerald-500 bg-emerald-50 text-emerald-700 shadow-[0_0_0_3px_rgba(16,185,129,0.15)] dark:bg-[#182c24] dark:text-[#34d399] dark:border-emerald-500 dark:shadow-[0_0_0_3px_rgba(52,211,153,0.12)]'
+    : 'border-purple-500 bg-purple-50 text-purple-700 shadow-[0_0_0_3px_rgba(139,92,246,0.15)] dark:bg-[#241c38] dark:text-[#a78bfa] dark:border-purple-500 dark:shadow-[0_0_0_3px_rgba(167,139,250,0.12)]';
+  const unselectedCls = 'border-[var(--c-border)] bg-[var(--c-surface-2)] text-[var(--c-text-2)] hover:border-[var(--c-border-strong)] hover:bg-[var(--c-surface)] hover:text-[var(--c-text-1)]';
 
   const handleSubmit = async () => {
     if (!file) return toast.error('Please select a file');
@@ -147,43 +148,52 @@ function UploadModal({ category, types, clientId, onClose, onUploaded }) {
     >
       <motion.div initial={{ scale: 0.95, y: 12 }} animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.95, y: 12 }} transition={{ duration: 0.2 }}
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
+        className="glass-panel rounded-2xl w-full max-w-md overflow-hidden"
       >
         <div className={`px-6 py-4 ${headerBg} flex items-center justify-between`}>
           <div>
-            <h3 className="font-semibold text-gray-900">Upload {isGst ? 'GST' : 'ITR'} Document</h3>
-            <p className="text-xs text-gray-500 mt-0.5">Select type and attach your file</p>
+            <h3 className="font-semibold text-gray-900 dark:text-[var(--c-text-1)]">Upload {isGst ? 'GST' : 'ITR'} Document</h3>
+            <p className="text-xs text-gray-500 dark:text-[var(--c-text-2)] mt-0.5">Select type and attach your file</p>
           </div>
-          <button onClick={onClose} className="p-1.5 hover:bg-white/60 rounded-lg transition-colors">
-            <RiCloseLine className="text-gray-500 text-lg" />
+          <button onClick={onClose} className="p-1.5 hover:bg-white/60 dark:hover:bg-white/10 rounded-lg transition-colors">
+            <RiCloseLine className="text-gray-500 dark:text-[var(--c-text-2)] text-lg" />
           </button>
         </div>
         <div className="p-6 space-y-4">
           <div>
-            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide block mb-2">Document Type</label>
-            <div className="grid grid-cols-2 gap-2">
-              {types.map(t => (
-                <button key={t.value} onClick={() => setDocType(t.value)}
-                  className={`px-3 py-2.5 rounded-xl border text-sm font-medium transition-all text-left ${
-                    docType === t.value ? selectedCls : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
-                  }`}>
-                  {docType === t.value && <RiCheckLine className="inline mr-1 text-xs" />}
-                  {t.label}
-                </button>
-              ))}
+            <label className="text-xs font-semibold text-gray-500 dark:text-[var(--c-text-3)] uppercase tracking-wide block mb-2">Document Type</label>
+            <div className="grid grid-cols-2 gap-2.5">
+              {types.map(t => {
+                const active = docType === t.value;
+                return (
+                  <button key={t.value} onClick={() => setDocType(t.value)}
+                    className={`px-3.5 py-3 rounded-xl border-2 text-sm font-semibold transition-all text-left flex items-center gap-2 ${
+                      active ? selectedCls : unselectedCls
+                    }`}>
+                    <span className={`w-4 h-4 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all ${
+                      active
+                        ? isGst ? 'border-emerald-500 bg-emerald-500 dark:border-emerald-400 dark:bg-emerald-400' : 'border-purple-500 bg-purple-500 dark:border-purple-400 dark:bg-purple-400'
+                        : 'border-[var(--c-border-strong)]'
+                    }`}>
+                      {active && <RiCheckLine className="text-white text-[9px]" />}
+                    </span>
+                    {t.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
           <div>
-            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide block mb-2">File</label>
+            <label className="text-xs font-semibold text-gray-500 dark:text-[var(--c-text-3)] uppercase tracking-wide block mb-2">File</label>
             <div
               onDragOver={e => { e.preventDefault(); setDragging(true); }}
               onDragLeave={() => setDragging(false)}
               onDrop={e => { e.preventDefault(); setDragging(false); if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]); }}
               onClick={() => document.getElementById('portal-file-input').click()}
               className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors ${
-                dragging ? 'border-indigo-400 bg-indigo-50' :
-                file    ? 'border-green-400 bg-green-50' :
-                          'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                dragging ? 'border-indigo-400 bg-indigo-50 dark:bg-[#1a2c40]' :
+                file    ? 'border-green-400 bg-green-50 dark:bg-[#182820]' :
+                          'border-gray-200 dark:border-[var(--c-border)] hover:border-gray-300 dark:hover:border-[var(--c-border-strong)] hover:bg-gray-50 dark:hover:bg-[var(--c-surface-2)]'
               }`}
             >
               <input id="portal-file-input" type="file" className="hidden"
@@ -193,8 +203,8 @@ function UploadModal({ category, types, clientId, onClose, onUploaded }) {
                 <div className="flex items-center justify-center gap-3">
                   <RiCheckLine className="text-green-500 text-xl flex-shrink-0" />
                   <div className="text-left min-w-0">
-                    <p className="text-sm font-medium text-gray-700 truncate max-w-[180px]">{file.name}</p>
-                    <p className="text-xs text-gray-400">{(file.size / 1024).toFixed(1)} KB</p>
+                    <p className="text-sm font-medium text-gray-700 dark:text-[var(--c-text-1)] truncate max-w-[180px]">{file.name}</p>
+                    <p className="text-xs text-gray-400 dark:text-[var(--c-text-3)]">{(file.size / 1024).toFixed(1)} KB</p>
                   </div>
                   <button onClick={e => { e.stopPropagation(); setFile(null); }}
                     className="ml-auto p-1 hover:bg-red-50 rounded-lg flex-shrink-0">
@@ -203,9 +213,9 @@ function UploadModal({ category, types, clientId, onClose, onUploaded }) {
                 </div>
               ) : (
                 <>
-                  <RiUploadCloud2Line className="text-3xl text-gray-300 mx-auto mb-2" />
-                  <p className="text-sm text-gray-500">Click or drag file here</p>
-                  <p className="text-xs text-gray-400 mt-1">PDF, Excel, Word, Image, CSV · max 50 MB</p>
+                  <RiUploadCloud2Line className="text-3xl text-gray-300 dark:text-[var(--c-text-3)] mx-auto mb-2" />
+                  <p className="text-sm text-gray-500 dark:text-[var(--c-text-2)]">Click or drag file here</p>
+                  <p className="text-xs text-gray-400 dark:text-[var(--c-text-3)] mt-1">PDF, Excel, Word, Image, CSV · max 50 MB</p>
                 </>
               )}
             </div>
@@ -227,8 +237,10 @@ function AnnouncementCard({ ann, index }) {
   const [expanded, setExpanded] = useState(false);
   const colors = CAT_COLORS[ann.category] || CAT_COLORS.general;
   return (
-    <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: index * 0.06 }}
+    <motion.div
+      initial={{ opacity: 0, x: -24, scale: 0.98 }}
+      animate={{ opacity: 1, x: 0, scale: 1 }}
+      transition={{ type: 'spring', stiffness: 340, damping: 28, delay: index * 0.06 }}
       className={`card overflow-hidden cursor-pointer group ${ann.isImportant ? 'border-l-4 border-l-red-400' : ''}`}
       onClick={() => setExpanded(v => !v)}
     >
@@ -238,7 +250,7 @@ function AnnouncementCard({ ann, index }) {
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <p className={`text-sm font-semibold ${ann.isImportant ? 'text-red-700' : 'text-gray-900'}`}>{ann.title}</p>
+            <p className={`text-sm font-semibold ${ann.isImportant ? 'text-red-700 dark:text-red-400' : 'text-gray-900 dark:text-[var(--c-text-1)]'}`}>{ann.title}</p>
             <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-md uppercase tracking-wide ${colors.bg} ${colors.text}`}>
               {ann.category}
             </span>
@@ -247,18 +259,18 @@ function AnnouncementCard({ ann, index }) {
             {expanded && (
               <motion.p initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}
-                className="text-xs text-gray-600 mt-1.5 leading-relaxed overflow-hidden">
+                className="text-xs text-gray-600 dark:text-[var(--c-text-2)] mt-1.5 leading-relaxed overflow-hidden">
                 {ann.content}
               </motion.p>
             )}
           </AnimatePresence>
-          {!expanded && <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">{ann.content}</p>}
+          {!expanded && <p className="text-xs text-gray-400 dark:text-[var(--c-text-3)] mt-0.5 line-clamp-1">{ann.content}</p>}
         </div>
-        <div className="flex flex-col items-end gap-1 flex-shrink-0">
-          <span className="text-[11px] text-gray-400 flex items-center gap-1">
-            <RiCalendarLine className="text-[10px]" />{fmtDate(ann.createdAt)}
+        <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
+          <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-gray-100 dark:bg-[var(--c-surface-2)] text-gray-500 dark:text-[var(--c-text-2)] border border-gray-200 dark:border-[var(--c-border)]">
+            <RiCalendarLine className="text-[9px]" />{fmtDate(ann.createdAt)}
           </span>
-          <span className="text-[10px] text-indigo-500 font-medium group-hover:text-indigo-700 transition-colors">
+          <span className="text-[10px] text-indigo-500 font-medium group-hover:text-indigo-700 dark:group-hover:text-[var(--c-brand)] transition-colors">
             {expanded ? 'Show less ▲' : 'Read more ▼'}
           </span>
         </div>
@@ -349,16 +361,16 @@ export default function ClientPortal() {
 
         
         <motion.section initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.05 }}>
-          <p className="text-sm text-gray-400 mb-1">
+          <p className="text-sm text-gray-400 dark:text-[var(--c-text-3)] mb-1">
             {now.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
           </p>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-[var(--c-text-1)]">
             {greeting}, {user?.name?.split(' ')[0]}.
           </h1>
           <div className="flex items-center gap-2 mt-2">
-            <RiBuilding2Line className="text-gray-400 text-sm" />
-            <span className="text-sm text-gray-500">{clientName}</span>
-            <span className="ml-2 inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-600">
+            <RiBuilding2Line className="text-gray-400 dark:text-[var(--c-text-3)] text-sm" />
+            <span className="text-sm text-gray-500 dark:text-[var(--c-text-2)]">{clientName}</span>
+            <span className="ml-2 inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-600 dark:bg-[#1a2c40] dark:text-[#60a5fa]">
               <RiShieldCheckLine className="text-xs" /> Client Portal
             </span>
           </div>
@@ -381,17 +393,17 @@ export default function ClientPortal() {
 
         
         <section>
-          <h2 className="text-base font-semibold text-gray-900 mb-4">Upload Documents</h2>
+          <h2 className="text-base font-semibold text-gray-900 dark:text-[var(--c-text-1)] mb-4">Upload Documents</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-              className="card p-5 border border-emerald-100 hover:border-emerald-300 transition-colors">
+              className="card p-5 border border-emerald-100 dark:border-[var(--c-border)] hover:border-emerald-300 dark:hover:border-emerald-700 transition-colors">
               <div className="flex items-start gap-4">
-                <div className="w-11 h-11 rounded-xl bg-emerald-50 flex items-center justify-center flex-shrink-0">
-                  <RiFileChartLine className="text-xl text-emerald-600" />
+                <div className="w-11 h-11 rounded-xl bg-emerald-50 dark:bg-[#182820] flex items-center justify-center flex-shrink-0">
+                  <RiFileChartLine className="text-xl text-emerald-600 dark:text-emerald-400" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-gray-900 text-sm">GST Documents</h3>
-                  <p className="text-xs text-gray-400 mt-0.5 mb-3">Bank Statement · Sales Invoice · Purchase Bill</p>
+                  <h3 className="font-semibold text-gray-900 dark:text-[var(--c-text-1)] text-sm">GST Documents</h3>
+                  <p className="text-xs text-gray-400 dark:text-[var(--c-text-3)] mt-0.5 mb-3">Bank Statement · Sales Invoice · Purchase Bill</p>
                   <button onClick={() => setUploadModal('gst_return')}
                     className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-colors">
                     <RiUploadCloud2Line /> Upload File
@@ -400,14 +412,14 @@ export default function ClientPortal() {
               </div>
             </motion.div>
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-              className="card p-5 border border-purple-100 hover:border-purple-300 transition-colors">
+              className="card p-5 border border-purple-100 dark:border-[var(--c-border)] hover:border-purple-300 dark:hover:border-purple-700 transition-colors">
               <div className="flex items-start gap-4">
-                <div className="w-11 h-11 rounded-xl bg-purple-50 flex items-center justify-center flex-shrink-0">
-                  <RiFilePdfLine className="text-xl text-purple-600" />
+                <div className="w-11 h-11 rounded-xl bg-purple-50 dark:bg-[#241c38] flex items-center justify-center flex-shrink-0">
+                  <RiFilePdfLine className="text-xl text-purple-600 dark:text-purple-400" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-gray-900 text-sm">ITR Documents</h3>
-                  <p className="text-xs text-gray-400 mt-0.5 mb-3">Form 16 · Investment Details · FDR · Rental Income</p>
+                  <h3 className="font-semibold text-gray-900 dark:text-[var(--c-text-1)] text-sm">ITR Documents</h3>
+                  <p className="text-xs text-gray-400 dark:text-[var(--c-text-3)] mt-0.5 mb-3">Form 16 · Investment Details · FDR · Rental Income</p>
                   <button onClick={() => setUploadModal('itr')}
                     className="inline-flex items-center gap-1.5 text-xs font-semibold text-purple-700 bg-purple-50 hover:bg-purple-100 px-3 py-1.5 rounded-lg transition-colors">
                     <RiUploadCloud2Line /> Upload File
@@ -422,7 +434,7 @@ export default function ClientPortal() {
         {recentAnns.length > 0 && (
           <section>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-base font-semibold text-gray-900">Updates from your CA</h2>
+              <h2 className="text-base font-semibold text-gray-900 dark:text-[var(--c-text-1)]">Updates from your CA</h2>
               <a href="/announcements" className="text-sm text-indigo-600 hover:text-indigo-700 font-medium flex items-center gap-1 transition-colors">
                 View all <RiArrowRightLine />
               </a>
@@ -435,7 +447,7 @@ export default function ClientPortal() {
 
         
         <motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
-          <h2 className="text-base font-semibold text-gray-900 mb-4">Your Files</h2>
+          <h2 className="text-base font-semibold text-gray-900 dark:text-[var(--c-text-1)] mb-4">Your Files</h2>
 
           
           <div className="grid grid-cols-2 gap-3 mb-5">
@@ -447,22 +459,26 @@ export default function ClientPortal() {
                   onClick={() => { setPrimaryTab(pt.key); setSubTab('all'); }}
                   className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-left ${
                     active
-                      ? 'border-gray-900 bg-gray-900 shadow-md'
-                      : 'border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50'
+                      ? 'border-white bg-white shadow-lg'
+                      : 'border-[var(--c-border)] bg-[var(--c-surface)] hover:border-[var(--c-border-strong)] hover:bg-[var(--c-surface-2)]'
                   }`}
                 >
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                    active ? 'bg-white/10' : pt.key === 'my_uploads' ? 'bg-indigo-50' : 'bg-emerald-50'
+                    active
+                      ? pt.key === 'my_uploads' ? 'bg-indigo-100' : 'bg-emerald-100'
+                      : pt.key === 'my_uploads' ? 'bg-[#1a2c40]' : 'bg-[#182820]'
                   }`}>
                     <pt.icon className={`text-xl ${
-                      active ? 'text-white' : pt.key === 'my_uploads' ? 'text-indigo-600' : 'text-emerald-600'
+                      active
+                        ? pt.key === 'my_uploads' ? 'text-indigo-600' : 'text-emerald-600'
+                        : pt.key === 'my_uploads' ? 'text-[#60a5fa]' : 'text-emerald-400'
                     }`} />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className={`font-semibold text-sm ${active ? 'text-white' : 'text-gray-800'}`}>{pt.label}</div>
-                    <div className={`text-xs truncate ${active ? 'text-gray-400' : 'text-gray-400'}`}>{pt.desc}</div>
+                    <div className={`font-semibold text-sm ${active ? 'text-gray-900' : 'text-[var(--c-text-1)]'}`}>{pt.label}</div>
+                    <div className={`text-xs truncate ${active ? 'text-gray-500' : 'text-[var(--c-text-3)]'}`}>{pt.desc}</div>
                   </div>
-                  <span className={`text-xl font-bold flex-shrink-0 ${active ? 'text-white' : 'text-gray-700'}`}>
+                  <span className={`text-xl font-bold flex-shrink-0 ${active ? 'text-gray-900' : 'text-[var(--c-text-1)]'}`}>
                     {count ?? '—'}
                   </span>
                 </motion.button>
@@ -471,19 +487,19 @@ export default function ClientPortal() {
           </div>
 
           
-          <div className="flex items-center gap-0.5 border-b border-gray-100 mb-5 overflow-x-auto">
+          <div className="flex items-center gap-0.5 border-b border-gray-100 dark:border-[var(--c-border)] mb-5 overflow-x-auto">
             {SUB_TABS.map(st => (
               <button key={st.key} onClick={() => setSubTab(st.key)}
                 className={`relative px-4 py-2 text-sm font-medium transition-colors whitespace-nowrap flex items-center gap-1.5 ${
-                  subTab === st.key ? 'text-gray-900' : 'text-gray-400 hover:text-gray-700'
+                  subTab === st.key ? 'text-gray-900 dark:text-[var(--c-text-1)]' : 'text-gray-400 dark:text-[var(--c-text-3)] hover:text-gray-700 dark:hover:text-[var(--c-text-1)]'
                 }`}>
                 <st.icon className="text-xs" />
                 {st.label}
                 {subCounts[st.key] > 0 && (
-                  <span className="ml-0.5 text-xs text-gray-400">({subCounts[st.key]})</span>
+                  <span className="ml-0.5 text-xs text-gray-400 dark:text-[var(--c-text-3)]">({subCounts[st.key]})</span>
                 )}
                 {subTab === st.key && (
-                  <motion.div layoutId="portal-sub-tab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900 rounded-full" />
+                  <motion.div layoutId="portal-sub-tab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900 dark:bg-[var(--c-brand)] rounded-full" />
                 )}
               </button>
             ))}
@@ -496,7 +512,7 @@ export default function ClientPortal() {
             </div>
           ) : filtered.length === 0 ? (
             <div className="py-16 flex flex-col items-center">
-              <RiFileTextLine className="text-4xl mb-3 text-gray-200" />
+              <RiFileTextLine className="text-4xl mb-3 text-gray-200 dark:text-[var(--c-border)]" />
               <p className="text-sm text-gray-500">
                 {primaryTab === 'my_uploads' ? 'No files uploaded yet' : 'No files from your CA yet'}
               </p>

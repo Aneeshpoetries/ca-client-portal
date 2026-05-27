@@ -6,6 +6,7 @@ import { ThemeProvider, useTheme } from './context/ThemeContext';
 import ParticleCursor from './components/ParticleCursor';
 import ProtectedRoute from './components/ProtectedRoute';
 
+import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Setup from './pages/Setup';
 import ForgotPassword from './pages/ForgotPassword';
@@ -82,8 +83,8 @@ export default function App() {
             <ProtectedRoute><Profile /></ProtectedRoute>
           } />
 
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/" element={<Landing />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

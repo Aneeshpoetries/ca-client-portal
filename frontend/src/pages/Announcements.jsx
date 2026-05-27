@@ -103,8 +103,8 @@ export default function Announcements() {
             <button key={c.value} onClick={() => setFilter(c.value)}
               className={`px-3 py-1 rounded-full text-xs font-semibold border transition-colors ${
                 filter === c.value
-                  ? 'bg-gray-900 text-white border-gray-900'
-                  : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'
+                  ? 'bg-gray-900 dark:bg-[var(--c-brand)] text-white border-gray-900 dark:border-[var(--c-brand)]'
+                  : 'bg-white dark:bg-[var(--c-surface)] text-gray-500 dark:text-[var(--c-text-2)] border-gray-200 dark:border-[var(--c-border)] hover:border-gray-300 dark:hover:border-[var(--c-border-strong)]'
               }`}>
               {c.label}
             </button>
@@ -129,10 +129,10 @@ export default function Announcements() {
               {filtered.map((ann, i) => (
                 <motion.div
                   key={ann._id}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -4 }}
-                  transition={{ delay: i * 0.04 }}
+                  initial={{ opacity: 0, x: -28, scale: 0.98 }}
+                  animate={{ opacity: 1, x: 0, scale: 1 }}
+                  exit={{ opacity: 0, x: 24, scale: 0.97 }}
+                  transition={{ type: 'spring', stiffness: 340, damping: 28, delay: i * 0.05 }}
                   className={`card px-5 py-4 group ${ann.isImportant ? 'border-l-4 border-l-red-400' : ''}`}
                 >
                   <div className="flex items-start justify-between gap-3">
@@ -140,27 +140,32 @@ export default function Announcements() {
                       {ann.isImportant && <RiAlertLine className="text-red-400 flex-shrink-0 mt-0.5 text-base" />}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap mb-1">
-                          <h3 className="text-sm font-semibold text-gray-900">{ann.title}</h3>
+                          <h3 className="text-sm font-semibold text-gray-900 dark:text-[var(--c-text-1)]">{ann.title}</h3>
                           <span className={`${catStyle[ann.category]} text-[11px]`}>{catLabel[ann.category]}</span>
                           {ann.isImportant && <span className="badge-red text-[11px]">Important</span>}
                         </div>
-                        <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{ann.content}</p>
-                        <div className="flex items-center gap-3 mt-2.5">
-                          <span className="text-xs text-gray-400 flex items-center gap-1">
-                            <RiCalendarLine className="text-xs" /> {fmtDate(ann.createdAt)}
+                        <p className="text-sm text-gray-600 dark:text-[var(--c-text-2)] leading-relaxed whitespace-pre-wrap">{ann.content}</p>
+                        <div className="flex items-center gap-2 mt-3 flex-wrap">
+                          <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-gray-100 dark:bg-[var(--c-surface-2)] text-gray-500 dark:text-[var(--c-text-2)] border border-gray-200 dark:border-[var(--c-border)]">
+                            <RiCalendarLine className="text-[10px]" />
+                            {fmtDate(ann.createdAt)}
                           </span>
-                          <span className="text-xs text-gray-400">by {ann.publishedBy?.name}</span>
+                          {ann.publishedBy?.name && (
+                            <span className="text-[11px] text-gray-400 dark:text-[var(--c-text-3)]">
+                              by {ann.publishedBy.name}
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>
                     {isCA && (
                       <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
                         <button onClick={() => openEdit(ann)}
-                          className="p-1.5 rounded-lg hover:bg-indigo-50 text-gray-400 hover:text-indigo-600 transition-colors" title="Edit">
+                          className="p-1.5 rounded-lg hover:bg-indigo-50 dark:hover:bg-[#1a2c40] text-gray-400 dark:text-[var(--c-text-3)] hover:text-indigo-600 dark:hover:text-[#60a5fa] transition-colors" title="Edit">
                           <RiEditLine className="text-base" />
                         </button>
                         <button onClick={() => handleDelete(ann._id)}
-                          className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-600 transition-colors" title="Delete">
+                          className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-[#2c1414] text-gray-400 dark:text-[var(--c-text-3)] hover:text-red-600 dark:hover:text-red-400 transition-colors" title="Delete">
                           <RiDeleteBinLine className="text-base" />
                         </button>
                       </div>
@@ -187,32 +192,32 @@ export default function Announcements() {
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0 }}
               transition={{ duration: 0.18 }}
-              className="bg-white rounded-2xl w-full max-w-lg shadow-2xl border border-gray-100"
+              className="glass-panel rounded-2xl w-full max-w-lg"
             >
-              <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
-                <h2 className="text-lg font-semibold text-gray-900">
+              <div className="flex items-center justify-between px-6 py-5 border-b border-white/50 dark:border-[var(--c-border)]">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-[var(--c-text-1)]">
                   {editing ? 'Edit announcement' : 'New announcement'}
                 </h2>
-                <button onClick={closeModal} className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors text-gray-400">
+                <button onClick={closeModal} className="p-1.5 hover:bg-gray-100 dark:hover:bg-[var(--c-surface-2)] rounded-lg transition-colors text-gray-400 dark:text-[var(--c-text-3)]">
                   <RiCloseLine className="text-lg" />
                 </button>
               </div>
               <form onSubmit={handleSave} className="px-6 py-5 space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 mb-1.5">Title *</label>
+                  <label className="block text-xs font-semibold text-gray-500 dark:text-[var(--c-text-3)] mb-1.5">Title *</label>
                   <input type="text" required value={form.title}
                     onChange={e => setForm({ ...form, title: e.target.value })}
                     className="input-field" placeholder="e.g. GST filing deadline reminder" autoFocus />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 mb-1.5">Content *</label>
+                  <label className="block text-xs font-semibold text-gray-500 dark:text-[var(--c-text-3)] mb-1.5">Content *</label>
                   <textarea rows={4} required value={form.content}
                     onChange={e => setForm({ ...form, content: e.target.value })}
                     className="input-field resize-none" placeholder="Write your announcement…" />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-gray-500 mb-1.5">Category</label>
+                    <label className="block text-xs font-semibold text-gray-500 dark:text-[var(--c-text-3)] mb-1.5">Category</label>
                     <select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} className="input-field">
                       {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                     </select>
@@ -222,11 +227,11 @@ export default function Announcements() {
                       <input type="checkbox" checked={form.isImportant}
                         onChange={e => setForm({ ...form, isImportant: e.target.checked })}
                         className="w-4 h-4 rounded accent-red-500" />
-                      <span className="text-sm font-medium text-gray-700">Mark as important</span>
+                      <span className="text-sm font-medium text-gray-700 dark:text-[var(--c-text-1)]">Mark as important</span>
                     </label>
                   </div>
                 </div>
-                <div className="flex gap-3 pt-2 border-t border-gray-100">
+                <div className="flex gap-3 pt-2 border-t border-white/50 dark:border-[var(--c-border)]">
                   <button type="button" onClick={closeModal} className="btn-secondary flex-1">Cancel</button>
                   <button type="submit" disabled={saving} className="btn-primary flex-1 justify-center">
                     {saving

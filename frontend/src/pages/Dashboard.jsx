@@ -50,10 +50,10 @@ function useP() {
     t1:     isDark ? '#ece9e4' : '#1a1f1e',
     t2:     isDark ? '#b0c0b8' : '#3d4a44',
     t3:     isDark ? '#6a8880' : '#7a8880',
-    muted:  isDark ? '#3d5448' : '#c8d0dc',
-    border: isDark ? '#2c3c34' : '#f1f5f9',
-    hover:  isDark ? '#1a2420' : '#f8fafc',
-    emptyBg:isDark ? '#1a2420' : '#f4f6fa',
+    muted:  isDark ? '#2a4060' : '#c8d0dc',
+    border: isDark ? '#1e3048' : '#f1f5f9',
+    hover:  isDark ? 'rgba(22, 34, 52, 0.40)' : '#f8fafc',
+    emptyBg:isDark ? '#0e1828' : '#f4f6fa',
     brand:  isDark ? '#20b89a' : '#0e5c4f',
     brandHover: isDark ? '#18a088' : '#0a4a3e',
     annBg:  isDark ? '#182820' : '#d6ede8',
@@ -62,16 +62,15 @@ function useP() {
   };
 }
 
-function StatCard({ label, value, icon: Icon, accentClass, iconBg, iconColor, loading, P }) {
+function StatCard({ label, value, bg, num, loading }) {
   return (
-    <motion.div variants={VARIANTS.card} className={`stat-card ${accentClass}`}>
-      <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: iconBg }}>
-        <Icon className="text-base" style={{ color: iconColor }} />
-      </div>
-      <p className="num text-2xl font-extrabold tracking-[-0.04em] leading-none" style={{ color: P.t1 }}>
-        {loading ? <span className="inline-block w-10 h-6 shimmer rounded" /> : value}
+    <motion.div variants={VARIANTS.card} whileHover={{ y: -2 }}
+      className="rounded-2xl px-5 py-5 flex flex-col gap-2"
+      style={{ background: bg }}>
+      <p className="num text-3xl font-extrabold tracking-[-0.045em] leading-none" style={{ color: num }}>
+        {loading ? <span className="inline-block w-12 h-8 shimmer rounded-lg" /> : value}
       </p>
-      <p className="text-xs font-medium" style={{ color: P.t3 }}>{label}</p>
+      <p className="text-xs font-semibold" style={{ color: num, opacity: 0.65 }}>{label}</p>
     </motion.div>
   );
 }
@@ -176,22 +175,32 @@ export default function Dashboard() {
   const fyStart = now.getMonth() >= 3 ? now.getFullYear() : now.getFullYear() - 1;
   const greeting = now.getHours() < 12 ? 'Good morning' : now.getHours() < 17 ? 'Good afternoon' : 'Good evening';
 
-  const IB = P.isDark
-    ? { indigo: 'rgba(99,102,241,0.18)',  purple: 'rgba(139,92,246,0.18)', pink: 'rgba(236,72,153,0.18)',  emerald: 'rgba(16,185,129,0.18)' }
-    : { indigo: '#eef2ff',                purple: '#faf5ff',               pink: '#fdf2f8',                emerald: '#ecfdf5' };
+  const SC = P.isDark
+    ? [
+        { bg: 'rgba(16,185,129,0.13)',  num: '#34d399' },
+        { bg: 'rgba(139,92,246,0.13)',  num: '#a78bfa' },
+        { bg: 'rgba(245,158,11,0.13)',  num: '#fbbf24' },
+        { bg: 'rgba(6,182,212,0.13)',   num: '#22d3ee' },
+      ]
+    : [
+        { bg: '#d1fae5', num: '#059669' },
+        { bg: '#ede9fe', num: '#7c3aed' },
+        { bg: '#fef3c7', num: '#d97706' },
+        { bg: '#cffafe', num: '#0891b2' },
+      ];
 
   const statCards = isCA
     ? [
-        { label: 'Total Clients',   value: stats.clients,    icon: RiTeamLine,         accentClass: 'accent-indigo',  iconBg: IB.indigo,  iconColor: P.isDark ? '#818cf8' : '#6366f1' },
-        { label: 'Total Documents', value: stats.totalDocs,  icon: RiFolder3Line,      accentClass: 'accent-purple',  iconBg: IB.purple,  iconColor: P.isDark ? '#a78bfa' : '#8b5cf6' },
-        { label: 'Client Uploads',  value: stats.clientDocs, icon: RiFolderUploadLine, accentClass: 'accent-pink',    iconBg: IB.pink,    iconColor: P.isDark ? '#f472b6' : '#ec4899' },
-        { label: 'Returns Filed',   value: stats.caReturns,  icon: RiFileChartLine,    accentClass: 'accent-emerald', iconBg: IB.emerald, iconColor: P.isDark ? '#34d399' : '#10b981' },
+        { label: 'Total Clients',   value: stats.clients,    ...SC[0] },
+        { label: 'Total Documents', value: stats.totalDocs,  ...SC[1] },
+        { label: 'Client Uploads',  value: stats.clientDocs, ...SC[2] },
+        { label: 'Returns Filed',   value: stats.caReturns,  ...SC[3] },
       ]
     : [
-        { label: 'My Clients',   value: stats.clients,    icon: RiTeamLine,         accentClass: 'accent-indigo',  iconBg: IB.indigo,  iconColor: P.isDark ? '#818cf8' : '#6366f1' },
-        { label: 'My Uploads',   value: stats.clientDocs, icon: RiFolderUploadLine, accentClass: 'accent-purple',  iconBg: IB.purple,  iconColor: P.isDark ? '#a78bfa' : '#8b5cf6' },
-        { label: 'CA Returns',   value: stats.caReturns,  icon: RiFileChartLine,    accentClass: 'accent-pink',    iconBg: IB.pink,    iconColor: P.isDark ? '#f472b6' : '#ec4899' },
-        { label: 'Total Docs',   value: stats.totalDocs,  icon: RiFolder3Line,      accentClass: 'accent-emerald', iconBg: IB.emerald, iconColor: P.isDark ? '#34d399' : '#10b981' },
+        { label: 'My Clients',   value: stats.clients,    ...SC[0] },
+        { label: 'My Uploads',   value: stats.clientDocs, ...SC[1] },
+        { label: 'CA Returns',   value: stats.caReturns,  ...SC[2] },
+        { label: 'Total Docs',   value: stats.totalDocs,  ...SC[3] },
       ];
 
   return (
@@ -221,7 +230,7 @@ export default function Dashboard() {
           </div>
 
           <motion.div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-7" variants={VARIANTS.page}>
-            {statCards.map(sc => <StatCard key={sc.label} {...sc} loading={loading} P={P} />)}
+            {statCards.map(sc => <StatCard key={sc.label} {...sc} loading={loading} />)}
           </motion.div>
         </motion.div>
 

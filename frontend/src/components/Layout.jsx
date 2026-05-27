@@ -1,5 +1,4 @@
 import Sidebar from './Sidebar';
-import ParticleField from './ParticleField';
 import { motion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 
@@ -11,11 +10,20 @@ export default function Layout({ children }) {
       className="min-h-screen relative overflow-x-hidden"
       style={{
         background: isDark
-          ? 'linear-gradient(145deg, #0e1410 0%, #111a16 40%, #0f1812 100%)'
-          : 'linear-gradient(145deg, #f2efe9 0%, #f5f2eb 40%, #eff4f0 100%)',
+          ? `
+            radial-gradient(ellipse 65% 55% at 0% 0%,   rgba(32,184,154,0.13) 0%, transparent 55%),
+            radial-gradient(ellipse 55% 45% at 100% 0%, rgba(99,102,241,0.10) 0%, transparent 55%),
+            radial-gradient(ellipse 45% 40% at 50% 100%,rgba(167,139,250,0.07) 0%, transparent 55%),
+            linear-gradient(145deg, #07101a 0%, #0c0f20 45%, #060d0a 100%)
+          `
+          : `
+            radial-gradient(ellipse 65% 55% at 0% 0%,   rgba(32,184,154,0.22) 0%, transparent 60%),
+            radial-gradient(ellipse 55% 45% at 100% 0%, rgba(99,102,241,0.14) 0%, transparent 55%),
+            radial-gradient(ellipse 45% 40% at 50% 100%,rgba(167,139,250,0.10) 0%, transparent 55%),
+            linear-gradient(145deg, #edfaf6 0%, #f0f4ff 45%, #faf5ff 100%)
+          `,
       }}
     >
-      <ParticleField count={200} dark={isDark} />
       <div className="relative z-10">
         <Sidebar />
         <motion.main

@@ -129,20 +129,20 @@ export default function Sidebar() {
   }, []);
 
   const handleLogout = async () => {
-    try { await logout(); navigate('/login'); toast.success('Signed out'); }
+    try { await logout(); navigate('/'); toast.success('Signed out'); }
     catch { toast.error('Logout failed'); }
   };
 
   const S = {
     header: isDark
-      ? { background: 'rgba(14,20,18,0.92)', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)',
-          borderBottom: '1px solid rgba(32,184,154,0.14)', boxShadow: '0 1px 0 rgba(32,184,154,0.08), 0 4px 16px rgba(0,0,0,0.35)' }
-      : { background: 'rgba(242,239,233,0.90)', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)',
-          borderBottom: '1px solid rgba(14,92,79,0.14)', boxShadow: '0 1px 0 rgba(14,92,79,0.08), 0 4px 16px rgba(20,30,25,0.07)' },
+      ? { background: 'rgba(7,16,26,0.88)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+          borderBottom: '1px solid rgba(30,48,72,0.70)', boxShadow: '0 1px 0 rgba(32,184,154,0.07), 0 4px 16px rgba(0,0,0,0.30)' }
+      : { background: 'rgba(255,255,255,0.80)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+          borderBottom: '1px solid rgba(32,184,154,0.12)', boxShadow: '0 1px 0 rgba(99,102,241,0.06), 0 4px 16px rgba(0,0,0,0.05)' },
 
     dropdown: isDark
-      ? { background: 'rgba(20,28,24,0.98)', border: '1px solid rgba(32,184,154,0.18)', boxShadow: '0 12px 28px -4px rgba(0,0,0,0.50), 0 4px 10px -2px rgba(0,0,0,0.35)' }
-      : { background: 'rgba(250,249,246,0.98)', border: '1px solid rgba(14,92,79,0.14)', boxShadow: '0 12px 28px -4px rgba(10,60,50,0.14), 0 4px 10px -2px rgba(20,30,25,0.08)' },
+      ? { background: 'rgba(10,18,32,0.98)', border: '1px solid rgba(30,48,72,0.80)', boxShadow: '0 12px 28px -4px rgba(0,0,0,0.50), 0 4px 10px -2px rgba(0,0,0,0.35)' }
+      : { background: 'rgba(252,254,255,0.98)', border: '1px solid rgba(32,184,154,0.15)', boxShadow: '0 12px 28px -4px rgba(32,184,154,0.10), 0 4px 10px -2px rgba(0,0,0,0.06)' },
 
     navActive: isDark
       ? { color: '#7de8d4', background: '#182820', boxShadow: 'inset 2px 0 0 #20b89a' }
@@ -161,8 +161,8 @@ export default function Sidebar() {
     panelLogout: isDark ? 'text-red-400 hover:bg-red-950/40' : 'text-red-600 hover:bg-red-50',
 
     mobileNav:    isDark
-      ? { background: 'rgba(14,20,18,0.98)', borderColor: 'rgba(32,184,154,0.12)' }
-      : { background: 'rgba(242,239,233,0.97)', borderColor: 'rgba(14,92,79,0.12)' },
+      ? { background: 'rgba(7,16,26,0.98)', borderColor: 'rgba(30,48,72,0.70)' }
+      : { background: 'rgba(250,252,255,0.97)', borderColor: 'rgba(32,184,154,0.12)' },
     mobileAccordBorder: isDark ? 'border-[#2c3c34]' : 'border-gray-100',
     mobileHeading:      isDark ? 'text-[#40c8a8]' : 'text-gray-400',
     userHover:          isDark ? 'hover:bg-[#182820]' : 'hover:bg-indigo-50',
